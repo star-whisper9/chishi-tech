@@ -1,0 +1,1 @@
+export { themeMiddleware } from "./theme";

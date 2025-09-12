@@ -1,7 +1,9 @@
-import { LockClockRounded, QrCode2Rounded } from "@mui/icons-material";
 import React from "react";
-// 可在此处 import 位图或 svg 资源，如:
-// import clockPng from '../assets/clock.png';
+import { QrCode2Rounded } from "@mui/icons-material";
+// 位图两种使用方式：
+// 1) public 下直接 /xxx.png 访问（不指纹）
+// 2) src/assets 下 import 进来（构建指纹，推荐）
+//    示例: import clockPng from '../assets/clock.png'; icon: <img src={clockPng} alt="Clock" />
 
 export type Page = {
   title: string;
@@ -14,20 +16,20 @@ export type Page = {
 export const pages: Page[] = [
   {
     title: "示例页面",
-    icon: React.createElement(LockClockRounded, {
-      color: "primary",
-      fontSize: "large",
-    }),
+    icon: (
+      <img
+        src={"/256.png"}
+        alt="示例图标"
+        style={{ width: 28, height: 28, objectFit: "contain" }}
+      />
+    ),
     description: "这是一个示例页面，展示了项目的基本结构。",
     lastUpdated: "2025-9-12",
     link: "/example",
   },
   {
     title: "二维码时钟",
-    icon: React.createElement(QrCode2Rounded, {
-      color: "secondary",
-      fontSize: "large",
-    }),
+    icon: <QrCode2Rounded color="secondary" fontSize="large" />,
     description: "每秒更新的时间二维码，可选择常用时区。",
     lastUpdated: "2025-9-12",
     link: "/qrclock",

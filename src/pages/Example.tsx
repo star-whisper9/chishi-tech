@@ -34,7 +34,7 @@ import {
 } from "@mui/icons-material";
 import MainLayout from "../components/layout/MainLayout";
 
-function Example() {
+function ExamplePage() {
   const [count, setCount] = useState(0);
   const [textValue, setTextValue] = useState("");
   const [switchChecked, setSwitchChecked] = useState(false);
@@ -363,4 +363,4 @@ function Example() {
   );
 }
 
-export default Example;
+export default ExamplePage;

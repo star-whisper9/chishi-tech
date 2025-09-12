@@ -10,9 +10,23 @@ interface MainLayoutProps {
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   return (
-    <Box sx={{ flexGrow: 1 }}>
+    <Box
+      sx={{
+        minHeight: "100vh",
+        display: "flex",
+        flexDirection: "column",
+      }}
+    >
       <Header />
-      <Container maxWidth="lg" sx={{ mt: 2 }}>
+      <Container
+        maxWidth="lg"
+        sx={{
+          mt: 2,
+          flexGrow: 1,
+          display: "flex",
+          flexDirection: "column",
+        }}
+      >
         {children}
       </Container>
       <Footer />

@@ -1,7 +1,6 @@
 import React from "react";
 import {
   Box,
-  // Container,
   Typography,
   Divider,
   Link,
@@ -66,10 +65,8 @@ const Footer: React.FC = () => {
           </Link>
         </Box>
 
-        {/* Divider: vertical on sm+, horizontal on xs */}
-        {isSmall ? (
-          <Divider sx={{ my: 1, width: "100%", borderColor: "grey.400" }} />
-        ) : (
+        {/* Divider: only visible on larger screens */}
+        {!isSmall && (
           <Divider
             orientation="vertical"
             flexItem

@@ -1,6 +1,8 @@
 import React from "react";
-import { Box, AppBar, Toolbar, Typography, Container } from "@mui/material";
-import ThemeSwitcher from "../common/ThemeSwitcher";
+import { Box, Container } from "@mui/material";
+import Header from "../common/Header";
+import Footer from "../common/Footer";
+import BackToTop from "../common/BackToTop";
 
 interface MainLayoutProps {
   children: React.ReactNode;
@@ -9,17 +11,12 @@ interface MainLayoutProps {
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
   return (
     <Box sx={{ flexGrow: 1 }}>
-      <AppBar position="static">
-        <Toolbar>
-          <Typography variant="h6" component="div" sx={{ flexGrow: 1 }}>
-            赤石科技
-          </Typography>
-          <ThemeSwitcher />
-        </Toolbar>
-      </AppBar>
+      <Header />
       <Container maxWidth="lg" sx={{ mt: 2 }}>
         {children}
       </Container>
+      <Footer />
+      <BackToTop />
     </Box>
   );
 };

@@ -20,7 +20,6 @@ import {
   Slider,
   Rating,
   Badge,
-  Fab,
   Snackbar,
   Grid,
 } from "@mui/material";
@@ -32,7 +31,6 @@ import {
   Edit,
   Star,
   NotificationsNone,
-  ShoppingCart,
 } from "@mui/icons-material";
 import MainLayout from "../components/layout/MainLayout";
 
@@ -352,19 +350,6 @@ function Example() {
             </Card>
           </Grid>
         </Grid>
-
-        {/* 浮动操作按钮 */}
-        <Fab
-          color="primary"
-          aria-label="add"
-          sx={{
-            position: "fixed",
-            bottom: 16,
-            right: 16,
-          }}
-        >
-          <ShoppingCart />
-        </Fab>
 
         {/* 通知栏 */}
         <Snackbar

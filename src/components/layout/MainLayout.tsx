@@ -3,35 +3,44 @@ import { Box, Container } from "@mui/material";
 import Header from "../common/Header";
 import Footer from "../common/Footer";
 import BackToTop from "../common/BackToTop";
+import RootLayout from "./RootLayout";
 
 interface MainLayoutProps {
   children: React.ReactNode;
+  title?: string;
+  titleSuffix?: string;
 }
 
-const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+const MainLayout: React.FC<MainLayoutProps> = ({
+  children,
+  title,
+  titleSuffix,
+}) => {
   return (
-    <Box
-      sx={{
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-      }}
-    >
-      <Header />
-      <Container
-        maxWidth="lg"
+    <RootLayout title={title} titleSuffix={titleSuffix}>
+      <Box
         sx={{
-          mt: 2,
-          flexGrow: 1,
+          minHeight: "100vh",
           display: "flex",
           flexDirection: "column",
         }}
       >
-        {children}
-      </Container>
-      <Footer />
-      <BackToTop />
-    </Box>
+        <Header />
+        <Container
+          maxWidth="lg"
+          sx={{
+            mt: 2,
+            flexGrow: 1,
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          {children}
+        </Container>
+        <Footer />
+        <BackToTop />
+      </Box>
+    </RootLayout>
   );
 };
 

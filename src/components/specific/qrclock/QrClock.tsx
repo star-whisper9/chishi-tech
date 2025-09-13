@@ -27,7 +27,7 @@ const QrClock: React.FC<QrClockProps> = ({
 }) => {
   const { timeZone, setTimeZone, text, formatted, availableTimeZones } =
     useQrClock();
-  const [showText, setShowText] = useState(true);
+  const [showText, setShowText] = useState(false);
 
   const handleChange = useCallback(
     (e: SelectChangeEvent<string>) => {

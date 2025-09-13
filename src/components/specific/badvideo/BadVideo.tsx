@@ -6,7 +6,7 @@ import {
   CardActions,
   CardContent,
   Divider,
-  LinearProgress,
+  CircularProgress,
   Paper,
   Slider,
   Stack,
@@ -23,7 +23,6 @@ const formatMB = (bytes: number) => `${(bytes / (1024 * 1024)).toFixed(0)} MB`;
 const BadVideo: React.FC = () => {
   const {
     status,
-    progress,
     error,
     outputUrl,
     file,
@@ -46,6 +45,21 @@ const BadVideo: React.FC = () => {
   >("success");
 
   const percentText = useMemo(() => (percent * 100).toFixed(3), [percent]);
+
+  // 预览 URL：使用 state 以触发渲染，且清理仅撤销本次创建的 URL
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  useEffect(() => {
+    let createdUrl: string | null = null;
+    if (file) {
+      createdUrl = URL.createObjectURL(file);
+      setPreviewUrl(createdUrl);
+    } else {
+      setPreviewUrl(null);
+    }
+    return () => {
+      if (createdUrl) URL.revokeObjectURL(createdUrl);
+    };
+  }, [file]);
 
   // 状态变化时提示
   useEffect(() => {
@@ -147,7 +161,7 @@ const BadVideo: React.FC = () => {
               <Box sx={{ maxWidth: "100%" }}>
                 <video
                   controls
-                  src={URL.createObjectURL(file)}
+                  src={previewUrl ?? undefined}
                   style={{ width: "100%", borderRadius: 8 }}
                 />
               </Box>
@@ -193,14 +207,8 @@ const BadVideo: React.FC = () => {
           </Stack>
 
           {status === "processing" && (
-            <Box>
-              <LinearProgress
-                variant="determinate"
-                value={Math.round(progress * 100)}
-              />
-              <Typography variant="caption" color="text.secondary">
-                进度：{Math.round(progress * 100)}%
-              </Typography>
+            <Box sx={{ display: "flex", justifyContent: "center" }}>
+              <CircularProgress size={40} />
             </Box>
           )}
 

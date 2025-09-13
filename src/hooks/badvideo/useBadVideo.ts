@@ -66,6 +66,8 @@ export default function useBadVideo(): UseBadVideoResult {
     setStatus("idle");
     setProgress(0);
     setError(null);
+    setFile(null);
+    setPercent(CONSTS.BADVIDEO.MIN_PERCENT);
     cleanupOutputUrl();
     cleanupBuffer();
     terminateWorker();

@@ -1,5 +1,6 @@
 import React from "react";
 import { QrCode2Rounded } from "@mui/icons-material";
+import VideocamOffRoundedIcon from "@mui/icons-material/VideocamOffRounded";
 // 位图两种使用方式：
 // 1) public 下直接 /xxx.png 访问（不指纹）
 // 2) src/assets 下 import 进来（构建指纹，推荐）
@@ -33,5 +34,12 @@ export const pages: Page[] = [
     description: "每秒更新的时间二维码，可选择常用时区。",
     lastUpdated: "2025-9-12",
     link: "/qrclock",
+  },
+  {
+    title: "随机损坏 MP4",
+    icon: <VideocamOffRoundedIcon color="error" fontSize="large" />,
+    description: "导出一个每字节有概率损坏的 MP4 视频文件。",
+    lastUpdated: "2025-9-13",
+    link: "/badvideo",
   },
 ];

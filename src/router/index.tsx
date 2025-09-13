@@ -2,6 +2,7 @@ import { createBrowserRouter } from "react-router-dom";
 import ExamplePage from "../pages/Example";
 import QrClockPage from "../pages/QrClock";
 import NavigationPage from "../pages/Navigation";
+import BadVideoPage from "../pages/BadVideo";
 
 export const router = createBrowserRouter([
   {
@@ -15,5 +16,9 @@ export const router = createBrowserRouter([
   {
     path: "/qrclock",
     element: <QrClockPage />,
+  },
+  {
+    path: "/badvideo",
+    element: <BadVideoPage />,
   },
 ]);

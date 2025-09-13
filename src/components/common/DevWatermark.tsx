@@ -8,13 +8,13 @@ import React from "react";
 const DevWatermark: React.FC = () => {
   // The watermark pattern will be an SVG tile. We'll use background-size to control spacing.
   const svg = encodeURIComponent(`
-    <svg xmlns='http://www.w3.org/2000/svg' width='420' height='240'>
+    <svg xmlns='http://www.w3.org/2000/svg' width='620' height='440'>
       <g transform='translate(0,0) rotate(45 210 120)'>
         <text x='210' y='100' text-anchor='middle' fill='rgba(0,0,0,0.06)' font-family='Arial, Helvetica, sans-serif' font-size='20'>
-          项目正在开发中
+          Dev Version
         </text>
-        <text x='210' y='130' text-anchor='middle' fill='rgba(0,0,0,0.06)' font-family='Arial, Helvetica, sans-serif' font-size='16'>
-          测试版不代表最终质量
+        <text x='210' y='130' text-anchor='middle' fill='rgba(0,0,0,0.06)' font-family='Arial, Helvetica, sans-serif' font-size='20'>
+          测试版非最终呈现
         </text>
       </g>
     </svg>
@@ -30,7 +30,7 @@ const DevWatermark: React.FC = () => {
     backgroundImage: `url("data:image/svg+xml;utf8,${svg}")`,
     backgroundRepeat: "repeat",
     // For roughly 6-8 tiles on 1920x1080, use a large tile size
-    backgroundSize: "420px 240px",
+    backgroundSize: "620px 440px",
     opacity: 1,
     zIndex: 9999,
     mixBlendMode: "normal",

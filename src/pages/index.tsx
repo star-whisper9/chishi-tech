@@ -12,6 +12,7 @@ export type Page = {
   description: string;
   lastUpdated: string;
   link: string;
+  shit?: boolean; // 可选标记，false 时显示缎带标记，null/undefined/true 时不显示
 };
 
 export const pages: Page[] = [
@@ -27,6 +28,7 @@ export const pages: Page[] = [
     description: "这是一个示例页面，展示了项目的基本结构。",
     lastUpdated: "2025-9-12",
     link: "/example",
+    shit: false, // 显示缎带标记
   },
   {
     title: "二维码时钟",

@@ -16,11 +16,37 @@ interface PageCardProps {
 
 const PageCard: React.FC<PageCardProps> = ({ page }) => {
   const navigate = useNavigate();
+  const showRibbon = page.shit === false; // 只有明确为 false 时才显示缎带
+
   return (
     <Card
       variant="outlined"
-      sx={{ height: "100%", display: "flex", flexDirection: "column" }}
+      sx={{
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        position: "relative",
+        overflow: "hidden",
+      }}
     >
+      {/* 缎带标记 */}
+      {showRibbon && (
+        <Box
+          sx={{
+            position: "absolute",
+            top: 16,
+            right: -32,
+            width: 120,
+            height: "1.2rem",
+            py: 0.5,
+            bgcolor: "error.main",
+            transform: "rotate(45deg)",
+            transformOrigin: "center",
+            zIndex: 1,
+            boxShadow: 2,
+          }}
+        ></Box>
+      )}
       <CardActionArea
         onClick={() => navigate(page.link)}
         sx={{ flexGrow: 1, alignItems: "stretch" }}

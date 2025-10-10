@@ -1,8 +1,21 @@
+import { lazy, Suspense } from "react";
 import { createBrowserRouter } from "react-router-dom";
-import ExamplePage from "../pages/Example";
-import QrClockPage from "../pages/QrClock";
+import PageLoadingFallback from "../components/common/PageLoadingFallback";
+
+// 懒加载页面组件
+const ExamplePage = lazy(() => import("../pages/Example"));
+const QrClockPage = lazy(() => import("../pages/QrClock"));
+const BadVideoPage = lazy(() => import("../pages/BadVideo"));
+
+// Navigation 页面作为首页，保持同步加载以获得最快的首屏速度
 import NavigationPage from "../pages/Navigation";
-import BadVideoPage from "../pages/BadVideo";
+
+// 包装懒加载组件的 Suspense
+const withSuspense = (Component: React.LazyExoticComponent<React.FC>) => (
+  <Suspense fallback={<PageLoadingFallback />}>
+    <Component />
+  </Suspense>
+);
 
 export const router = createBrowserRouter([
   {
@@ -11,14 +24,14 @@ export const router = createBrowserRouter([
   },
   {
     path: "/example",
-    element: <ExamplePage />,
+    element: withSuspense(ExamplePage),
   },
   {
     path: "/qrclock",
-    element: <QrClockPage />,
+    element: withSuspense(QrClockPage),
   },
   {
     path: "/badvideo",
-    element: <BadVideoPage />,
+    element: withSuspense(BadVideoPage),
   },
 ]);

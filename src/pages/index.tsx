@@ -1,5 +1,5 @@
 import React from "react";
-import { QrCode2Rounded } from "@mui/icons-material";
+import { QrCode2Rounded, VideoFileRounded } from "@mui/icons-material";
 import VideocamOffRoundedIcon from "@mui/icons-material/VideocamOffRounded";
 // 位图两种使用方式：
 // 1) public 下直接 /xxx.png 访问（不指纹）
@@ -32,7 +32,7 @@ export const pages: Page[] = [
   },
   {
     title: "二维码时钟",
-    icon: <QrCode2Rounded color="secondary" fontSize="large" />,
+    icon: <QrCode2Rounded color="primary" fontSize="large" />,
     description: "每秒更新的时间二维码，可选择常用时区。",
     lastUpdated: "2025-9-12",
     link: "/qrclock",
@@ -43,5 +43,13 @@ export const pages: Page[] = [
     description: "导出一个每字节有概率损坏的 MP4 视频文件。",
     lastUpdated: "2025-9-13",
     link: "/badvideo",
+  },
+  {
+    title: "视频格式转换器",
+    icon: <VideoFileRounded color="primary" fontSize="large" />,
+    description: "在本地快捷转换视频格式，同时支持视频转动图。",
+    lastUpdated: "2025-10-11",
+    link: "/videoconvertor",
+    shit: false,
   },
 ];

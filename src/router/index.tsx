@@ -6,6 +6,7 @@ import PageLoadingFallback from "../components/common/PageLoadingFallback";
 const ExamplePage = lazy(() => import("../pages/Example"));
 const QrClockPage = lazy(() => import("../pages/QrClock"));
 const BadVideoPage = lazy(() => import("../pages/BadVideo"));
+const VideoConvertorPage = lazy(() => import("../pages/VideoConvertor"));
 
 // Navigation 页面作为首页，保持同步加载以获得最快的首屏速度
 import NavigationPage from "../pages/Navigation";
@@ -33,5 +34,9 @@ export const router = createBrowserRouter([
   {
     path: "/badvideo",
     element: withSuspense(BadVideoPage),
+  },
+  {
+    path: "/videoconvertor",
+    element: withSuspense(VideoConvertorPage),
   },
 ]);

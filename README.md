@@ -1,5 +1,136 @@
 # React + TypeScript + Vite
 
+赤石科技工具集 - 基于 React 18、TypeScript 和 Vite 构建的现代 Web 应用。
+
+## 功能特性
+
+- **视频转换器**: 基于 FFmpeg.wasm 的浏览器端视频转换工具，支持 WORKERFS 处理大文件（最大 20GB）
+- **二维码时钟**: 动态生成包含时间信息的二维码
+- **BadVideo**: 视频文件损坏工具
+- 更多工具开发中...
+
+## 技术栈
+
+- React 18
+- TypeScript
+- Vite
+- Material-UI (MUI)
+- Redux Toolkit
+- FFmpeg.wasm (with WORKERFS support)
+
+## 快速开始
+
+### 安装依赖
+
+```bash
+npm install
+```
+
+### 开发模式
+
+```bash
+npm run dev
+```
+
+应用会在 `http://localhost:5173` 启动，并自动配置了跨域隔离响应头以支持 FFmpeg.wasm。
+
+### 构建生产版本
+
+```bash
+npm run build
+```
+
+构建输出在 `dist/` 目录。
+
+### 预览生产构建
+
+```bash
+npm run preview
+```
+
+## 部署
+
+**⚠️ 重要：** 本项目使用 FFmpeg.wasm，需要特定的 HTTP 响应头才能正常工作：
+
+```
+Cross-Origin-Opener-Policy: same-origin
+Cross-Origin-Embedder-Policy: require-corp
+```
+
+### 快速部署指南
+
+详细部署说明请参考 [DEPLOYMENT.md](./DEPLOYMENT.md)
+
+**Nginx 最小配置：**
+
+```nginx
+server {
+    listen 80;
+    server_name your-domain.com;
+    root /var/www/chishi-tech/dist;
+
+    # 必需的跨域隔离头
+    add_header Cross-Origin-Opener-Policy "same-origin" always;
+    add_header Cross-Origin-Embedder-Policy "require-corp" always;
+
+    location / {
+        try_files $uri $uri/ /index.html;
+    }
+}
+```
+
+**Vercel 配置（vercel.json）：**
+
+```json
+{
+  "headers": [
+    {
+      "source": "/(.*)",
+      "headers": [
+        { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" },
+        { "key": "Cross-Origin-Embedder-Policy", "value": "require-corp" }
+      ]
+    }
+  ]
+}
+```
+
+### 支持的部署平台
+
+✅ Nginx、Apache、Vercel、Netlify、Docker  
+❌ GitHub Pages (不支持自定义响应头)
+
+完整配置示例参见：
+
+- [nginx.conf.example](./nginx.conf.example) - Nginx 完整配置
+- [DEPLOYMENT.md](./DEPLOYMENT.md) - 详细部署指南
+
+## 项目结构
+
+```
+src/
+  ├── config/          # 静态配置
+  ├── utils/           # 工具函数
+  ├── assets/          # 静态资源
+  ├── router/          # 路由配置
+  ├── stores/          # Redux 状态管理
+  ├── pages/           # 页面组件
+  ├── components/      # UI 组件
+  │   ├── common/      # 通用组件
+  │   ├── layout/      # 布局组件
+  │   └── specific/    # 业务组件
+  └── hooks/           # 自定义 Hooks
+```
+
+## FFmpeg.wasm 与 WORKERFS
+
+本项目集成了 FFmpeg.wasm 的 WORKERFS 功能，允许处理大型视频文件：
+
+- **支持 WORKERFS 的环境**：最大文件大小 20GB
+- **不支持的环境**：自动回退到 RAM 模式，限制 768MB
+
+系统会自动检测并选择最佳模式。详细信息请查看浏览器控制台日志。
+
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 
 Currently, two official plugins are available:

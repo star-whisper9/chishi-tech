@@ -35,6 +35,7 @@ import {
   type GifConfig,
 } from "../../../hooks/useVideoConvertor";
 import { CONSTS } from "../../../config/consts";
+import { formatFileSize } from "../../../utils/ffmpegHelper";
 import GifConfigPanel from "./GifConfigPanel";
 
 // eslint-disable-next-line @typescript-eslint/no-empty-object-type
@@ -49,6 +50,8 @@ const VideoConvertor: React.FC<VideoConvertorProps> = () => {
     progress,
     error,
     outputFile,
+    supportsWorkerFS,
+    maxFileSize: defaultMaxFileSize,
     loadFFmpeg,
     convertVideo,
     clearOutput,
@@ -61,9 +64,8 @@ const VideoConvertor: React.FC<VideoConvertorProps> = () => {
   const [outputFormat, setOutputFormat] = React.useState<OutputFormat>("mp4");
   const [previewUrl, setPreviewUrl] = React.useState<string | null>(null);
   const [videoDuration, setVideoDuration] = React.useState<number | null>(null);
-  const [maxFileSize, setMaxFileSize] = React.useState<number>(
-    CONSTS.VIDEO_CONVERTOR.MAX_FILE_SIZE_BYTES
-  );
+  const [maxFileSize, setMaxFileSize] =
+    React.useState<number>(defaultMaxFileSize);
   const [showUnlockDialog, setShowUnlockDialog] = React.useState(false);
   const [gifConfig, setGifConfig] = React.useState<GifConfig>({
     fps: 10,
@@ -167,15 +169,6 @@ const VideoConvertor: React.FC<VideoConvertorProps> = () => {
     setShowUnlockDialog(false);
   };
 
-  // 格式化文件大小
-  const formatFileSize = (bytes: number): string => {
-    if (bytes < 1024) return `${bytes} B`;
-    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(2)} KB`;
-    if (bytes < 1024 * 1024 * 1024)
-      return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
-    return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
-  };
-
   return (
     <Box sx={{ maxWidth: 800, mx: "auto", py: 3 }}>
       <Card elevation={3}>
@@ -185,6 +178,41 @@ const VideoConvertor: React.FC<VideoConvertorProps> = () => {
             <Alert severity="info" sx={{ mb: 2 }}>
               <Typography variant="body2">正在加载 FFmpeg...</Typography>
               <LinearProgress sx={{ mt: 1 }} />
+            </Alert>
+          )}
+
+          {/* WORKERFS 支持信息 */}
+          {!isLoading && supportsWorkerFS && (
+            <Alert severity="success" sx={{ mb: 2 }}>
+              <Typography variant="body2">
+                ✨ 检测到 WORKERFS 支持！可以处理最大{" "}
+                {formatFileSize(CONSTS.VIDEO_CONVERTOR.MAX_FILE_SIZE_WORKERFS)}{" "}
+                的视频文件
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mt: 0.5, display: "block" }}
+              >
+                大文件将直接从磁盘读取，不会占用过多内存
+              </Typography>
+            </Alert>
+          )}
+
+          {/* RAM 模式提示 */}
+          {!isLoading && !supportsWorkerFS && (
+            <Alert severity="warning" sx={{ mb: 2 }}>
+              <Typography variant="body2">
+                当前环境不支持 WORKERFS，文件处理将使用内存模式
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                sx={{ mt: 0.5, display: "block" }}
+              >
+                建议文件大小不超过{" "}
+                {formatFileSize(CONSTS.VIDEO_CONVERTOR.MAX_FILE_SIZE_RAM)}
+              </Typography>
             </Alert>
           )}
 
@@ -204,24 +232,25 @@ const VideoConvertor: React.FC<VideoConvertorProps> = () => {
           )}
 
           <Stack spacing={3}>
-            {/* 文件大小限制设置 */}
-            {maxFileSize < CONSTS.VIDEO_CONVERTOR.MAX_SIZE_UNLOCKED && (
-              <Alert severity="info" sx={{ mb: 0 }}>
-                <Typography variant="body2" gutterBottom>
-                  当前文件大小限制: {formatFileSize(maxFileSize)}
-                </Typography>
-                <Button
-                  size="small"
-                  variant="outlined"
-                  onClick={handleUnlockSizeLimit}
-                  startIcon={<WarningRounded />}
-                  sx={{ mt: 1 }}
-                >
-                  解除限制（最大{" "}
-                  {formatFileSize(CONSTS.VIDEO_CONVERTOR.MAX_SIZE_UNLOCKED)}）
-                </Button>
-              </Alert>
-            )}
+            {/* 文件大小限制设置 - 仅在不支持 WORKERFS 时显示 */}
+            {!supportsWorkerFS &&
+              maxFileSize < CONSTS.VIDEO_CONVERTOR.MAX_SIZE_UNLOCKED && (
+                <Alert severity="info" sx={{ mb: 0 }}>
+                  <Typography variant="body2" gutterBottom>
+                    当前文件大小限制: {formatFileSize(maxFileSize)}
+                  </Typography>
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={handleUnlockSizeLimit}
+                    startIcon={<WarningRounded />}
+                    sx={{ mt: 1 }}
+                  >
+                    解除限制（最大{" "}
+                    {formatFileSize(CONSTS.VIDEO_CONVERTOR.MAX_SIZE_UNLOCKED)}）
+                  </Button>
+                </Alert>
+              )}
 
             {/* 文件选择 */}
             <Box>

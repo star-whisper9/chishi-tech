@@ -1,7 +1,12 @@
 import { useState, useRef, useCallback } from "react";
-import { FFmpeg } from "@ffmpeg/ffmpeg";
+import { FFFSType, FFmpeg } from "@ffmpeg/ffmpeg";
 import { toBlobURL, fetchFile } from "@ffmpeg/util";
 import { CONSTS } from "../config/consts";
+import {
+  isWorkerFSSupported,
+  getMimeType,
+  getFileExtension,
+} from "../utils/ffmpegHelper";
 
 export type OutputFormat = "mp4" | "mov" | "mkv" | "gif";
 
@@ -24,6 +29,8 @@ export interface UseVideoConvertorReturn {
   error: string | null;
   outputFile: { url: string; name: string } | null;
   previewUrl: string | null;
+  supportsWorkerFS: boolean; // 是否支持 WORKERFS
+  maxFileSize: number; // 当前环境下的最大文件大小限制
   loadFFmpeg: () => Promise<void>;
   convertVideo: (
     file: File,
@@ -46,9 +53,15 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
     name: string;
   } | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [supportsWorkerFS, setSupportsWorkerFS] = useState(false);
 
   const ffmpegRef = useRef<FFmpeg | null>(null);
   const isLoadedRef = useRef(false);
+
+  // 根据 WORKERFS 支持情况确定最大文件大小
+  const maxFileSize = supportsWorkerFS
+    ? CONSTS.VIDEO_CONVERTOR.MAX_FILE_SIZE_WORKERFS
+    : CONSTS.VIDEO_CONVERTOR.MAX_FILE_SIZE_RAM;
 
   /**
    * 加载 FFmpeg
@@ -98,6 +111,25 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
       ffmpegRef.current = ffmpeg;
       isLoadedRef.current = true;
       console.log("FFmpeg 加载成功");
+
+      // FFmpeg 加载完成后，检测 WORKERFS 支持
+      console.log("[WORKERFS] 开始检测支持...");
+      const workerFSSupported = await isWorkerFSSupported(ffmpeg);
+      setSupportsWorkerFS(workerFSSupported);
+
+      if (workerFSSupported) {
+        console.log(
+          `[WORKERFS] ✅ 支持！文件大小限制提升至 ${
+            CONSTS.VIDEO_CONVERTOR.MAX_FILE_SIZE_WORKERFS / (1024 * 1024 * 1024)
+          } GB`
+        );
+      } else {
+        console.log(
+          `[WORKERFS] ❌ 不支持，使用 RAM 模式，文件大小限制 ${
+            CONSTS.VIDEO_CONVERTOR.MAX_FILE_SIZE_RAM / (1024 * 1024)
+          } MB`
+        );
+      }
     } catch (err) {
       const errorMessage =
         err instanceof Error ? err.message : "加载 FFmpeg 失败";
@@ -138,32 +170,83 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
       }
       setOutputFile(null);
 
+      // 决定是否使用 WORKERFS
+      const useWorkerFS =
+        supportsWorkerFS &&
+        file.size > CONSTS.VIDEO_CONVERTOR.MAX_FILE_SIZE_RAM;
+
       try {
         const ffmpeg = ffmpegRef.current;
         const inputFileName = "input" + getFileExtension(file.name);
         const outputFileName = `output.${outputFormat}`;
 
-        // 写入输入文件
-        console.log("写入输入文件...");
-        await ffmpeg.writeFile(inputFileName, await fetchFile(file));
+        if (useWorkerFS) {
+          // 使用 WORKERFS 模式：挂载文件，无需加载到内存
+          console.log("[WORKERFS] 使用 WORKERFS 模式处理大文件...");
 
-        // 执行转换
-        console.log("开始转换...");
-        const args = getFFmpegArgs(
-          inputFileName,
-          outputFileName,
-          outputFormat,
-          gifConfig
-        );
-        await ffmpeg.exec(args);
+          const inputDir = "/input";
+          const inputFilePath = `${inputDir}/${file.name}`;
 
-        // 读取输出文件
+          try {
+            // 创建输入目录
+            await ffmpeg.createDir(inputDir);
+
+            // 挂载 WORKERFS
+            await ffmpeg.mount(FFFSType.WORKERFS, { files: [file] }, inputDir);
+
+            // 执行转换
+            console.log("开始转换...");
+            const args = getFFmpegArgs(
+              inputFilePath,
+              outputFileName,
+              outputFormat,
+              gifConfig
+            );
+            await ffmpeg.exec(args);
+
+            // 卸载和清理
+            await ffmpeg.unmount(inputDir);
+            await ffmpeg.deleteDir(inputDir);
+          } catch (err) {
+            // 如果 WORKERFS 失败，尝试清理
+            try {
+              await ffmpeg.unmount(inputDir).catch(() => {});
+              await ffmpeg.deleteDir(inputDir).catch(() => {});
+            } catch {
+              // 忽略清理错误
+            }
+            throw err;
+          }
+        } else {
+          // 使用传统 RAM 模式：将文件写入内存文件系统
+          console.log("[RAM] 使用传统 RAM 模式...");
+
+          // 写入输入文件
+          console.log("写入输入文件...");
+          await ffmpeg.writeFile(inputFileName, await fetchFile(file));
+
+          // 执行转换
+          console.log("开始转换...");
+          const args = getFFmpegArgs(
+            inputFileName,
+            outputFileName,
+            outputFormat,
+            gifConfig
+          );
+          await ffmpeg.exec(args);
+
+          // 清理输入文件
+          await ffmpeg.deleteFile(inputFileName);
+        }
+
+        // 读取输出文件（两种模式都写到 MEMFS）
         console.log("读取输出文件...");
         const data = await ffmpeg.readFile(outputFileName);
 
         // 创建 Blob URL
-        // @ts-expect-error ffmpeg.wasm 类型定义问题，data 实际上是 Uint8Array
-        const blob = new Blob([data], { type: getMimeType(outputFormat) });
+        const blob = new Blob([data as BlobPart], {
+          type: getMimeType(outputFormat),
+        });
         const url = URL.createObjectURL(blob);
 
         // 生成输出文件名
@@ -171,10 +254,9 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
         const outputName = `${originalNameWithoutExt}.${outputFormat}`;
 
         setOutputFile({ url, name: outputName });
-        console.log("转换成功");
+        console.log(`转换成功 (使用 ${useWorkerFS ? "WORKERFS" : "RAM"} 模式)`);
 
-        // 清理 FFmpeg 内存中的文件
-        await ffmpeg.deleteFile(inputFileName);
+        // 清理输出文件
         await ffmpeg.deleteFile(outputFileName);
       } catch (err) {
         const errorMessage =
@@ -186,7 +268,7 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
         setProgress(null);
       }
     },
-    [outputFile]
+    [outputFile, supportsWorkerFS]
   );
 
   /**
@@ -225,6 +307,8 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
     error,
     outputFile,
     previewUrl,
+    supportsWorkerFS,
+    maxFileSize,
     loadFFmpeg,
     convertVideo,
     clearOutput,
@@ -233,27 +317,6 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
     revokePreviewUrl,
   };
 };
-
-/**
- * 获取文件扩展名
- */
-function getFileExtension(filename: string): string {
-  const match = filename.match(/\.[^/.]+$/);
-  return match ? match[0] : "";
-}
-
-/**
- * 获取 MIME 类型
- */
-function getMimeType(format: OutputFormat): string {
-  const mimeTypes: Record<OutputFormat, string> = {
-    mp4: "video/mp4",
-    mov: "video/quicktime",
-    mkv: "video/x-matroska",
-    gif: "image/gif",
-  };
-  return mimeTypes[format] || "video/mp4";
-}
 
 /**
  * 获取 FFmpeg 转换参数

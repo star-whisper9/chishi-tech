@@ -4,11 +4,9 @@ export const CONSTS = {
     FFMPEG: "https://unpkg.com/@ffmpeg/core-mt@0.12.10/dist/esm",
   },
   VIDEO_CONVERTOR: {
-    // RAM 模式：最大允许文件大小（字节），默认 768 MiB，避免内存与性能问题
-    MAX_FILE_SIZE_RAM: 768 * 1024 * 1024,
-    // WORKERFS 模式：最大文件限制 20 GiB（直接访问文件，不占用 RAM）
-    MAX_FILE_SIZE_WORKERFS: 20 * 1024 * 1024 * 1024,
-    // 向后兼容：解限的最大文件限制 4 GiB
+    // 最大允许文件大小（字节），默认 768 MiB，避免内存与性能问题
+    MAX_FILE_SIZE_BYTES: 768 * 1024 * 1024,
+    // 解限的最大文件限制 4 GiB
     MAX_SIZE_UNLOCKED: 4 * 1024 * 1024 * 1024,
     // GIF 限制
     MAX_FRAMES: 1000,

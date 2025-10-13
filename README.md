@@ -4,7 +4,7 @@
 
 ## 功能特性
 
-- **视频转换器**: 基于 FFmpeg.wasm 的浏览器端视频转换工具，支持 WORKERFS 处理大文件（最大 20GB）
+- **视频转换器**: 基于 FFmpeg.wasm 的浏览器端视频转换工具
 - **二维码时钟**: 动态生成包含时间信息的二维码
 - **BadVideo**: 视频文件损坏工具
 - 更多工具开发中...
@@ -16,7 +16,7 @@
 - Vite
 - Material-UI (MUI)
 - Redux Toolkit
-- FFmpeg.wasm (with WORKERFS support)
+- FFmpeg.wasm
 
 ## 快速开始
 
@@ -122,14 +122,20 @@ src/
   └── hooks/           # 自定义 Hooks
 ```
 
-## FFmpeg.wasm 与 WORKERFS
+## FFmpeg.wasm 支持
 
-本项目集成了 FFmpeg.wasm 的 WORKERFS 功能，允许处理大型视频文件：
+本项目集成了 FFmpeg.wasm，支持在浏览器端进行视频转换：
 
-- **支持 WORKERFS 的环境**：最大文件大小 20GB
-- **不支持的环境**：自动回退到 RAM 模式，限制 768MB
+- 使用 WebAssembly 技术，无需服务器处理
+- 所有转换在本地完成，保护隐私
+- 支持 WORKERFS 优化（在支持的浏览器环境中自动启用）
 
-系统会自动检测并选择最佳模式。详细信息请查看浏览器控制台日志。
+**文件大小限制**：
+
+- 默认限制：768MB
+- 可解除至：4GB（需用户确认）
+
+**注意**：由于输出文件需要写入内存，建议处理的视频文件不要过大，以免造成浏览器卡顿或崩溃。
 
 This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
 

@@ -30,7 +30,6 @@ export interface UseVideoConvertorReturn {
   outputFile: { url: string; name: string } | null;
   previewUrl: string | null;
   supportsWorkerFS: boolean; // 是否支持 WORKERFS
-  maxFileSize: number; // 当前环境下的最大文件大小限制
   loadFFmpeg: () => Promise<void>;
   convertVideo: (
     file: File,
@@ -59,11 +58,6 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
   const ffmpegRef = useRef<FFmpeg | null>(null);
   const isLoadedRef = useRef(false);
   const abortControllerRef = useRef<AbortController | null>(null);
-
-  // 根据 WORKERFS 支持情况确定最大文件大小
-  const maxFileSize = supportsWorkerFS
-    ? CONSTS.VIDEO_CONVERTOR.MAX_FILE_SIZE_WORKERFS
-    : CONSTS.VIDEO_CONVERTOR.MAX_FILE_SIZE_RAM;
 
   /**
    * 加载 FFmpeg
@@ -120,17 +114,9 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
       setSupportsWorkerFS(workerFSSupported);
 
       if (workerFSSupported) {
-        console.log(
-          `[WORKERFS] ✅ 支持！文件大小限制提升至 ${
-            CONSTS.VIDEO_CONVERTOR.MAX_FILE_SIZE_WORKERFS / (1024 * 1024 * 1024)
-          } GB`
-        );
+        console.log("[WORKERFS] ✅ 支持！将在处理时优先使用 WORKERFS 模式");
       } else {
-        console.log(
-          `[WORKERFS] ❌ 不支持，使用 RAM 模式，文件大小限制 ${
-            CONSTS.VIDEO_CONVERTOR.MAX_FILE_SIZE_RAM / (1024 * 1024)
-          } MB`
-        );
+        console.log("[WORKERFS] ❌ 不支持，将使用 RAM 模式");
       }
     } catch (err) {
       const errorMessage =
@@ -176,10 +162,8 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
       }
       setOutputFile(null);
 
-      // 决定是否使用 WORKERFS
-      const useWorkerFS =
-        supportsWorkerFS &&
-        file.size > CONSTS.VIDEO_CONVERTOR.MAX_FILE_SIZE_RAM;
+      // 决定是否使用 WORKERFS：如果支持就使用，无论文件大小
+      const useWorkerFS = supportsWorkerFS;
 
       try {
         const ffmpeg = ffmpegRef.current;
@@ -335,7 +319,6 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
     outputFile,
     previewUrl,
     supportsWorkerFS,
-    maxFileSize,
     loadFFmpeg,
     convertVideo,
     cancelConversion,

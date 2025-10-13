@@ -37,6 +37,7 @@ export interface UseVideoConvertorReturn {
     outputFormat: OutputFormat,
     gifConfig?: GifConfig
   ) => Promise<void>;
+  cancelConversion: () => void; // 取消转换
   clearOutput: () => void;
   clearError: () => void;
   getPreviewUrl: (file: File) => string;
@@ -57,6 +58,7 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
 
   const ffmpegRef = useRef<FFmpeg | null>(null);
   const isLoadedRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
 
   // 根据 WORKERFS 支持情况确定最大文件大小
   const maxFileSize = supportsWorkerFS
@@ -160,6 +162,10 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
         return;
       }
 
+      // 创建新的 AbortController
+      const abortController = new AbortController();
+      abortControllerRef.current = abortController;
+
       setIsConverting(true);
       setError(null);
       setProgress(null);
@@ -194,7 +200,7 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
             // 挂载 WORKERFS
             await ffmpeg.mount(FFFSType.WORKERFS, { files: [file] }, inputDir);
 
-            // 执行转换
+            // 执行转换（带 AbortSignal）
             console.log("开始转换...");
             const args = getFFmpegArgs(
               inputFilePath,
@@ -202,7 +208,9 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
               outputFormat,
               gifConfig
             );
-            await ffmpeg.exec(args);
+            await ffmpeg.exec(args, undefined, {
+              signal: abortController.signal,
+            });
 
             // 卸载和清理
             await ffmpeg.unmount(inputDir);
@@ -225,7 +233,7 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
           console.log("写入输入文件...");
           await ffmpeg.writeFile(inputFileName, await fetchFile(file));
 
-          // 执行转换
+          // 执行转换（带 AbortSignal）
           console.log("开始转换...");
           const args = getFFmpegArgs(
             inputFileName,
@@ -233,7 +241,9 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
             outputFormat,
             gifConfig
           );
-          await ffmpeg.exec(args);
+          await ffmpeg.exec(args, undefined, {
+            signal: abortController.signal,
+          });
 
           // 清理输入文件
           await ffmpeg.deleteFile(inputFileName);
@@ -259,17 +269,34 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
         // 清理输出文件
         await ffmpeg.deleteFile(outputFileName);
       } catch (err) {
-        const errorMessage =
-          err instanceof Error ? err.message : "视频转换失败";
-        setError(errorMessage);
-        console.error("视频转换失败:", err);
+        // 检查是否是用户取消
+        if (err instanceof DOMException && err.name === "AbortError") {
+          console.log("转换已被用户取消");
+          setError("转换已取消");
+        } else {
+          const errorMessage =
+            err instanceof Error ? err.message : "视频转换失败";
+          setError(errorMessage);
+          console.error("视频转换失败:", err);
+        }
       } finally {
         setIsConverting(false);
         setProgress(null);
+        abortControllerRef.current = null;
       }
     },
     [outputFile, supportsWorkerFS]
   );
+
+  /**
+   * 取消转换
+   */
+  const cancelConversion = useCallback(() => {
+    if (abortControllerRef.current && isConverting) {
+      console.log("正在取消转换...");
+      abortControllerRef.current.abort();
+    }
+  }, [isConverting]);
 
   /**
    * 获取视频预览 URL
@@ -311,6 +338,7 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
     maxFileSize,
     loadFFmpeg,
     convertVideo,
+    cancelConversion,
     clearOutput,
     clearError,
     getPreviewUrl,

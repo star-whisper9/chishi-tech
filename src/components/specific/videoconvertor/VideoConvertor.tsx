@@ -54,6 +54,7 @@ const VideoConvertor: React.FC<VideoConvertorProps> = () => {
     maxFileSize: defaultMaxFileSize,
     loadFFmpeg,
     convertVideo,
+    cancelConversion,
     clearOutput,
     clearError,
     getPreviewUrl,
@@ -356,17 +357,32 @@ const VideoConvertor: React.FC<VideoConvertorProps> = () => {
                 )}
 
                 {/* 转换按钮 */}
-                <Button
-                  variant="contained"
-                  color="primary"
-                  size="large"
-                  startIcon={<PlayCircleOutlineRounded />}
-                  onClick={handleConvert}
-                  disabled={!selectedFile || isLoading || isConverting}
-                  fullWidth
-                >
-                  {isConverting ? "转换中..." : "开始转换"}
-                </Button>
+                {!isConverting ? (
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    size="large"
+                    startIcon={<PlayCircleOutlineRounded />}
+                    onClick={handleConvert}
+                    disabled={!selectedFile || isLoading || isConverting}
+                    fullWidth
+                  >
+                    开始转换
+                  </Button>
+                ) : (
+                  <Stack direction="row" spacing={2}>
+                    <Button
+                      variant="outlined"
+                      color="error"
+                      size="large"
+                      startIcon={<CloseRounded />}
+                      onClick={cancelConversion}
+                      fullWidth
+                    >
+                      取消转换
+                    </Button>
+                  </Stack>
+                )}
               </>
             )}
 

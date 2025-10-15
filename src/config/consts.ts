@@ -6,8 +6,8 @@ export const CONSTS = {
   VIDEO_CONVERTOR: {
     // 最大允许文件大小（字节），默认 768 MiB，避免内存与性能问题
     MAX_FILE_SIZE_BYTES: 768 * 1024 * 1024,
-    // 解限的最大文件限制 4 GiB
-    MAX_SIZE_UNLOCKED: 4 * 1024 * 1024 * 1024,
+    // 解限的最大文件限制 1.95 GiB，理论上 WebAssembly 只有 2G MemFS 限制
+    MAX_SIZE_UNLOCKED: 1.95 * 1024 * 1024 * 1024,
     // GIF 限制
     MAX_FRAMES: 1000,
     MAX_FPS: 30,

@@ -1,6 +1,5 @@
 import React from "react";
 import TitleManager from "../common/TitleManager";
-import DevWatermark from "../common/DevWatermark";
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -20,7 +19,6 @@ const RootLayout: React.FC<RootLayoutProps> = ({
   return (
     <>
       <TitleManager title={title} titleSuffix={titleSuffix} />
-      <DevWatermark />
       {children}
     </>
   );

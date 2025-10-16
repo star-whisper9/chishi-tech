@@ -173,6 +173,13 @@ const VideoConvertor: React.FC<VideoConvertorProps> = () => {
     <Box sx={{ maxWidth: 800, mx: "auto", py: 3 }}>
       <Card elevation={3}>
         <CardContent>
+          <Alert severity="info" sx={{ mb: 2 }}>
+            <Typography variant="body2" color="text.secondary">
+              请避免使用 32 位浏览器，有可能加载失败甚至崩溃。
+              <br />
+              浏览器转码处理速度慢（尤其是H.265编码），请耐心等待，大文件建议使用原生应用。
+            </Typography>
+          </Alert>
           {/* FFmpeg 加载状态 */}
           {isLoading && (
             <Alert severity="info" sx={{ mb: 2 }}>

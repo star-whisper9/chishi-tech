@@ -60,7 +60,7 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
   const abortControllerRef = useRef<AbortController | null>(null);
 
   /**
-   * 加载 FFmpeg
+   * 加载 FFmpeg（带回退机制：优先多线程，失败则回退单线程）
    */
   const loadFFmpeg = useCallback(async () => {
     if (isLoadedRef.current && ffmpegRef.current) {
@@ -71,7 +71,6 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
     setError(null);
 
     try {
-      const baseURL = CONSTS.CDN_PACKAGES.FFMPEG;
       const ffmpeg = new FFmpeg();
 
       // 监听日志
@@ -88,25 +87,61 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
         });
       });
 
-      // 加载 FFmpeg 核心
-      await ffmpeg.load({
-        coreURL: await toBlobURL(
-          `${baseURL}/ffmpeg-core.js`,
-          "text/javascript"
-        ),
-        wasmURL: await toBlobURL(
-          `${baseURL}/ffmpeg-core.wasm`,
-          "application/wasm"
-        ),
-        workerURL: await toBlobURL(
-          `${baseURL}/ffmpeg-core.worker.js`,
-          "text/javascript"
-        ),
-      });
+      // 尝试加载 FFmpeg 核心（优先多线程版本）
+      let loadSuccess = false;
+      let lastError: Error | null = null;
+
+      // 首先尝试多线程版本（性能更好）
+      try {
+        console.log("[FFmpeg] 正在加载多线程版本...");
+        const baseURL_MT = CONSTS.CDN_PACKAGES.FFMPEG_MT;
+        await ffmpeg.load({
+          coreURL: await toBlobURL(
+            `${baseURL_MT}/ffmpeg-core.js`,
+            "text/javascript"
+          ),
+          wasmURL: await toBlobURL(
+            `${baseURL_MT}/ffmpeg-core.wasm`,
+            "application/wasm"
+          ),
+          workerURL: await toBlobURL(
+            `${baseURL_MT}/ffmpeg-core.worker.js`,
+            "text/javascript"
+          ),
+        });
+        loadSuccess = true;
+        console.log("[FFmpeg] ✅ 多线程版本加载成功");
+      } catch (err) {
+        console.warn("[FFmpeg] ⚠️ 多线程版本加载失败，尝试单线程版本...", err);
+        lastError = err instanceof Error ? err : new Error(String(err));
+
+        // 回退到单线程版本（兼容性更好）
+        try {
+          const baseURL = CONSTS.CDN_PACKAGES.FFMPEG;
+          await ffmpeg.load({
+            coreURL: await toBlobURL(
+              `${baseURL}/ffmpeg-core.js`,
+              "text/javascript"
+            ),
+            wasmURL: await toBlobURL(
+              `${baseURL}/ffmpeg-core.wasm`,
+              "application/wasm"
+            ),
+          });
+          loadSuccess = true;
+          console.log("[FFmpeg] ✅ 单线程版本加载成功");
+        } catch (stErr) {
+          console.error("[FFmpeg] ❌ 单线程版本也加载失败", stErr);
+          lastError = stErr instanceof Error ? stErr : new Error(String(stErr));
+        }
+      }
+
+      if (!loadSuccess) {
+        throw lastError || new Error("所有 FFmpeg 版本均加载失败");
+      }
 
       ffmpegRef.current = ffmpeg;
       isLoadedRef.current = true;
-      console.log("FFmpeg 加载成功");
 
       // FFmpeg 加载完成后，检测 WORKERFS 支持
       console.log("[WORKERFS] 开始检测支持...");

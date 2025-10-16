@@ -1,7 +1,10 @@
 export const CONSTS = {
   DEFAULT_SUFFIX: "赤石科技",
   CDN_PACKAGES: {
-    FFMPEG: "https://unpkg.com/@ffmpeg/core-mt@0.12.10/dist/esm",
+    // 多线程版本（优先使用，性能更好）
+    FFMPEG_MT: "https://cdn.jsdmirror.com/npm/@ffmpeg/core-mt@0.12.10/dist/esm",
+    // 单线程版本（回退选项，兼容性更好）
+    FFMPEG: "https://cdn.jsdmirror.com/npm/@ffmpeg/core@0.12.6/dist/esm",
   },
   VIDEO_CONVERTOR: {
     // 最大允许文件大小（字节），默认 768 MiB，避免内存与性能问题

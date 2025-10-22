@@ -3,10 +3,10 @@ import {
   Box,
   Typography,
   Divider,
-  Link,
   useTheme,
   useMediaQuery,
 } from "@mui/material";
+import GlitchText from "./GlitchText";
 
 const Footer: React.FC = () => {
   const theme = useTheme();
@@ -35,34 +35,7 @@ const Footer: React.FC = () => {
             alignItems: isSmall ? "center" : "flex-end",
           }}
         >
-          <Link
-            href="https://beian.miit.gov.cn/"
-            variant="body2"
-            underline="hover"
-          >
-            滇ICP备2024042847号-1
-          </Link>
-          <Link
-            href="https://beian.mps.gov.cn/#/query/webSearch?code=53011102001478"
-            variant="body2"
-            underline="hover"
-            sx={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 0.5,
-            }}
-          >
-            <img
-              src="/beian.png"
-              alt="公安备案徽标"
-              style={{
-                width: 16,
-                height: 16,
-                verticalAlign: "middle",
-              }}
-            />
-            <span>滇公网安备53011102001478号</span>
-          </Link>
+          <GlitchText prefix="Built with " glitchLength={4} />
         </Box>
 
         {/* Divider: only visible on larger screens */}

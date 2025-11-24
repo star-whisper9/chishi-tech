@@ -4,7 +4,7 @@
 
 # 项目技术栈
 
-- React 18
+- React 19
 - TypeScript
 - Vite
 

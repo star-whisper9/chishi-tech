@@ -1,10 +1,21 @@
-import React from "react";
-import { Box, Typography, Alert } from "@mui/material";
+import React, { useState } from "react";
+import {
+  Box,
+  Typography,
+  Alert,
+  IconButton,
+  Tooltip,
+  Collapse,
+} from "@mui/material";
 import { useParams } from "react-router-dom";
 import { useApiSpecs } from "../../../hooks/useApiSpecs";
 import ApiServiceHeader from "./ApiServiceHeader";
 import ApiTableOfContents from "./ApiTableOfContents";
 import ApiEndpointSection from "./ApiEndpointSection";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+
+const TOC_WIDTH = 330;
 
 const ApiServiceDetail: React.FC = () => {
   const { service, version } = useParams<{
@@ -12,6 +23,7 @@ const ApiServiceDetail: React.FC = () => {
     version: string;
   }>();
   const { bundles } = useApiSpecs();
+  const [tocExpanded, setTocExpanded] = useState(true);
 
   // 查找当前服务的所有版本
   const serviceBundles = bundles.filter((b) => b.service === service);
@@ -65,17 +77,42 @@ const ApiServiceDetail: React.FC = () => {
               ))}
             </Box>
 
+            {/* 大屏模式：可折叠的侧边目录 */}
             <Box
               sx={{
-                width: 240,
-                flexShrink: 0,
-                display: { xs: "none", lg: "block" },
+                display: { xs: "none", lg: "flex" },
+                alignItems: "flex-start",
                 position: "sticky",
                 top: 100,
                 alignSelf: "flex-start",
               }}
             >
-              <ApiTableOfContents endpoints={currentBundle.endpoints} />
+              {/* 折叠/展开按钮 */}
+              <Tooltip title={tocExpanded ? "收起目录" : "展开目录"}>
+                <IconButton
+                  onClick={() => setTocExpanded(!tocExpanded)}
+                  size="small"
+                  sx={{
+                    border: 1,
+                    borderColor: "divider",
+                    borderRadius: 1,
+                    mr: tocExpanded ? 1 : 0,
+                    backgroundColor: "background.paper",
+                    "&:hover": {
+                      backgroundColor: "action.hover",
+                    },
+                  }}
+                >
+                  {tocExpanded ? <ChevronRightIcon /> : <ChevronLeftIcon />}
+                </IconButton>
+              </Tooltip>
+
+              {/* 水平折叠的目录内容 */}
+              <Collapse in={tocExpanded} orientation="horizontal">
+                <Box sx={{ width: TOC_WIDTH }}>
+                  <ApiTableOfContents endpoints={currentBundle.endpoints} />
+                </Box>
+              </Collapse>
             </Box>
           </Box>
           {/* 小屏浮动按钮由 TOC 组件自己控制 */}

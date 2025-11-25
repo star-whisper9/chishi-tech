@@ -1,6 +1,6 @@
 import React from "react";
 import { Typography, Box } from "@mui/material";
-import { useGlitchText } from "../../hooks/useGlitchText";
+import { useGlitchText } from "../../../hooks/useGlitchText";
 
 interface GlitchTextProps {
   prefix?: string;

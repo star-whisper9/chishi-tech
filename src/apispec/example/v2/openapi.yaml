@@ -1,0 +1,69 @@
+openapi: 3.1.0
+info:
+  title: 全特性测试服务 V2
+  description: V2 版本，包含弃用逻辑测试。
+  version: 2.0.0
+servers:
+  - url: https://api.example.com/v2
+    description: 生产环境 V2
+
+components:
+  schemas:
+    Order:
+      $ref: "../v1/openapi.yaml#/components/schemas/Order" # 实际项目中可能引用公共文件，这里示意复用
+
+paths:
+  # === 1. 被弃用的旧接口 ===
+  /orders/{orderId}:
+    get:
+      operationId: getOrderDetailV1
+      summary: 获取订单详情 (旧)
+      # [关键点 1] 原生标记弃用
+      deprecated: true
+
+      # [关键点 2] 自定义扩展：指向替代接口
+      x-replaced-by:
+        path: "/trade-orders/{orderId}"
+        method: "get"
+        operationId: "getTradeOrderDetail"
+        description: "V2 版本架构调整，请迁移至 trade-orders。"
+
+      tags:
+        - 订单管理(Legacy)
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 兼容性返回
+          content:
+            application/json:
+              schema:
+                type: object # 简化示例
+
+  # === 2. 新的替代接口 ===
+  /trade-orders/{orderId}:
+    get:
+      operationId: getTradeOrderDetail
+      summary: 获取交易订单详情 (新)
+      tags:
+        - 交易中心
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: 成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string

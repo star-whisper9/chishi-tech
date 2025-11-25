@@ -1,7 +1,7 @@
 import React from "react";
 import { Box, Container } from "@mui/material";
 import Header from "../common/Header";
-import Footer from "../common/Footer";
+import Footer from "../common/Footer/Footer";
 import BackToTop from "../common/BackToTop";
 import RootLayout from "./RootLayout";
 

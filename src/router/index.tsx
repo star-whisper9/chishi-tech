@@ -7,6 +7,8 @@ const ExamplePage = lazy(() => import("../pages/Example"));
 const QrClockPage = lazy(() => import("../pages/QrClock"));
 const BadVideoPage = lazy(() => import("../pages/BadVideo"));
 const VideoConvertorPage = lazy(() => import("../pages/VideoConvertor"));
+const ApiListPage = lazy(() => import("../pages/ApiList"));
+const ApiDetailPage = lazy(() => import("../pages/ApiDetail"));
 
 // Navigation 页面作为首页，保持同步加载以获得最快的首屏速度
 import NavigationPage from "../pages/Navigation";
@@ -38,5 +40,13 @@ export const router = createBrowserRouter([
   {
     path: "/videoconvertor",
     element: withSuspense(VideoConvertorPage),
+  },
+  {
+    path: "/api",
+    element: withSuspense(ApiListPage),
+  },
+  {
+    path: "/api/:service/:version",
+    element: withSuspense(ApiDetailPage),
   },
 ]);

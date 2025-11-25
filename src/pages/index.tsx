@@ -1,9 +1,5 @@
 import React from "react";
-import {
-  QrCode2Rounded,
-  VideoFileRounded,
-  ApiRounded,
-} from "@mui/icons-material";
+import { QrCode2Rounded, VideoFileRounded } from "@mui/icons-material";
 import VideocamOffRoundedIcon from "@mui/icons-material/VideocamOffRounded";
 // 位图两种使用方式：
 // 1) public 下直接 /xxx.png 访问（不指纹）
@@ -55,12 +51,5 @@ export const pages: Page[] = [
     lastUpdated: "2025-10-11",
     link: "/videoconvertor",
     shit: false,
-  },
-  {
-    title: "API 文档",
-    icon: <ApiRounded color="secondary" fontSize="large" />,
-    description: "浏览所有可用的 HTTP API 接口文档，包含参数、响应和示例代码。",
-    lastUpdated: "2025-11-25",
-    link: "/api",
   },
 ];

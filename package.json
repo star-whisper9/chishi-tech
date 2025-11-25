@@ -4,10 +4,10 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
+    "dev": "npm run generate:api && vite",
+    "build": "npm run generate:api && tsc -b && vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
+    "preview": "npm run generate:api && vite preview",
     "generate:api": "tsx scripts/generateApiSpecs.ts"
   },
   "dependencies": {

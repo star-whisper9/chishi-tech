@@ -11,7 +11,7 @@ export const useGlitchText = (
   interval: number = 150
 ): string => {
   const [glitchText, setGlitchText] = useState<string>("");
-  const intervalRef = useRef<number | null>(null);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Character set for glitch effect
   const characters =

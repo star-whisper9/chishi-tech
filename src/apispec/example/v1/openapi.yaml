@@ -1,0 +1,142 @@
+openapi: 3.1.0
+info:
+  title: 全特性测试服务
+  description: 用于测试 generateApiSpecs.ts 解析能力的演示文档。
+  version: 1.0.0
+servers:
+  - url: https://api.example.com/v1
+    description: 生产环境
+
+# 1. 组件定义：测试 resolveRef 和 resolveSchema 的递归能力
+components:
+  schemas:
+    # 基础模型
+    User:
+      type: object
+      required: [id, username]
+      properties:
+        id:
+          type: integer
+          example: 1001 # 测试 generateExample 优先取值
+        username:
+          type: string
+          example: "star_whisper"
+        role:
+          type: string
+          enum: [admin, user, guest] # 测试 enum 解析
+          example: "admin"
+
+    # 复杂嵌套模型
+    Order:
+      type: object
+      properties:
+        orderId:
+          type: string
+          example: "ORD-2025-8888"
+        # 测试 $ref 引用
+        buyer:
+          $ref: "#/components/schemas/User"
+        # 测试 Array 和嵌套结构
+        items:
+          type: array
+          items:
+            type: object
+            properties:
+              productId:
+                type: integer
+                example: 99
+              name:
+                type: string
+                example: "高级机械键盘"
+              tags:
+                type: array
+                items:
+                  type: string
+                  example: "数码"
+
+paths:
+  # 2. GET 请求：测试 Parameters 解析、Path/Query/Header 混合
+  /orders/{orderId}:
+    get:
+      operationId: getOrderDetail
+      summary: 获取订单详情
+      description: |
+        测试点：
+        1. Path 参数替换 (buildCurlExample)
+        2. Header 参数解析
+        3. x-error-codes 解析
+      tags:
+        - 订单管理
+      parameters:
+        - name: orderId
+          in: path
+          required: true
+          description: 订单唯一标识
+          schema:
+            type: string
+            example: "ORD-2025-8888" # 用于生成 curl URL
+        - name: detailed
+          in: query
+          description: 是否返回详细信息
+          schema:
+            type: boolean
+            example: true
+        - name: X-Request-ID
+          in: header
+          required: false
+          schema:
+            type: string
+            example: "req-abc-123"
+      responses:
+        "200":
+          description: 成功返回订单
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Order" # 测试 Response 的 ref 展开
+
+      # 3. 你的自定义扩展字段：x-error-codes
+      x-error-codes:
+        - code: ORDER_NOT_FOUND
+          httpStatus: 404
+          message: 指定的订单不存在
+          solution: 请检查 orderId 是否正确，或联系客服。
+        - code: PERMISSION_DENIED
+          httpStatus: 403
+          message: 无权查看此订单
+          solution: 请尝试重新登录或升级权限。
+
+  # 4. POST 请求：测试 RequestBody 解析和 curl -d 生成
+  /orders:
+    post:
+      operationId: createOrder
+      summary: 创建新订单
+      tags:
+        - 订单管理
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              # 测试直接引用，generateExample 应该能递归生成完整的 JSON Body
+              $ref: "#/components/schemas/Order"
+      responses:
+        "201":
+          description: 创建成功
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  newId:
+                    type: string
+                    example: "ORD-NEW-001"
+
+      # 测试不同类型的错误码结构
+      x-error-codes:
+        - code: INVENTORY_SHORTAGE
+          httpStatus: 409
+          message: 商品库存不足

@@ -57,6 +57,11 @@ export interface ApiEndpoint {
   errorCodes?: ApiErrorCode[]; // 自定义业务错误码（从 x-error-codes 解析）
   searchText: string; // 预留给 Pagefind 整页渲染时注入内容
   curlExample?: string; // 构建期生成的简单 curl 示例
+  codeExamples?: {
+    fetch?: string; // Node fetch 风格（curlconverter toNode）
+    axios?: string; // Axios 版本（curlconverter toNodeAxios）
+    python?: string; // Python requests 示例（curlconverter toPython）
+  }; // 构建期生成的多语言调用示例
 }
 
 export interface ApiServiceBundle {

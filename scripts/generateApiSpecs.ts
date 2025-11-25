@@ -20,6 +20,7 @@ import {
   HttpMethod,
   ApiErrorCode,
 } from "../src/config/api/types";
+import { toNode, toNodeAxios, toPython } from "curlconverter";
 
 const SPEC_ROOT = path.resolve("src/apispec");
 const OUTPUT_FILE = path.resolve("src/generated/api/apiSpecs.generated.ts");
@@ -295,6 +296,20 @@ function extractEndpoints(
         requestBody,
         doc
       );
+      let codeExamples: ApiEndpoint["codeExamples"] | undefined;
+      if (curlExample) {
+        try {
+          codeExamples = {
+            fetch: toNode(curlExample),
+            axios: toNodeAxios(curlExample),
+            python: toPython(curlExample),
+          };
+          // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        } catch (e) {
+          // 保留空，避免阻断生成流程
+          codeExamples = undefined;
+        }
+      }
       endpoints.push({
         service,
         version,
@@ -311,6 +326,7 @@ function extractEndpoints(
         errorCodes: errorCodes.length > 0 ? errorCodes : undefined,
         searchText: searchTextParts.join("\n"),
         curlExample,
+        codeExamples,
       });
     }
   }

@@ -186,6 +186,7 @@ function extractEndpoints(
   doc: OpenAPIV3.Document
 ): ApiEndpoint[] {
   const endpoints: ApiEndpoint[] = [];
+  // TODO 可以考虑支持多个 server
   const baseUrl = doc.servers?.[0]?.url ?? "https://api.example.com";
   for (const rawPath in doc.paths) {
     const pathItem = doc.paths[rawPath];

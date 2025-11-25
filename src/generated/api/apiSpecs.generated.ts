@@ -660,12 +660,12 @@ export const apiSpecs: ApiSpecsGenerated = {
         },
         "servers": [
           {
-            "url": "https://github-contributions-api.jogruber.de",
-            "description": "原版官方托管"
-          },
-          {
             "url": "https://api.f1a.me/github-contributions-api",
             "description": "赤石科技镜像托管"
+          },
+          {
+            "url": "https://github-contributions-api.jogruber.de",
+            "description": "原版官方托管"
           }
         ],
         "tags": [
@@ -702,7 +702,7 @@ export const apiSpecs: ApiSpecsGenerated = {
                           "docs": {
                             "type": "string",
                             "format": "uri",
-                            "example": "https://github-contributions-api.jogruber.de"
+                            "example": "https://github.com/grubersjoe/github-contributions-api"
                           }
                         }
                       }
@@ -1143,7 +1143,7 @@ export const apiSpecs: ApiSpecsGenerated = {
                   "docs": {
                     "type": "string",
                     "format": "uri",
-                    "example": "https://github-contributions-api.jogruber.de"
+                    "example": "https://github.com/grubersjoe/github-contributions-api"
                   }
                 }
               },
@@ -1161,15 +1161,15 @@ export const apiSpecs: ApiSpecsGenerated = {
                   }
                 }
               },
-              "exampleJson": "{\n  \"message\": \"Welcome to the GitHub Contributions API.\",\n  \"version\": \"v4\",\n  \"docs\": \"https://github-contributions-api.jogruber.de\"\n}"
+              "exampleJson": "{\n  \"message\": \"Welcome to the GitHub Contributions API.\",\n  \"version\": \"v4\",\n  \"docs\": \"https://github.com/grubersjoe/github-contributions-api\"\n}"
             }
           ],
           "searchText": "getWelcome\n/\n获取 API 欢迎信息\n返回 API 的基本信息和文档链接\ncontributions",
-          "curlExample": "curl -X GET 'https://github-contributions-api.jogruber.de/' -H 'Accept: application/json'",
+          "curlExample": "curl -X GET 'https://api.f1a.me/github-contributions-api/' -H 'Accept: application/json'",
           "codeExamples": {
-            "fetch": "import fetch from 'node-fetch';\n\nfetch('https://github-contributions-api.jogruber.de/', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
-            "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://github-contributions-api.jogruber.de/', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
-            "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get('https://github-contributions-api.jogruber.de/', headers=headers)\n"
+            "fetch": "import fetch from 'node-fetch';\n\nfetch('https://api.f1a.me/github-contributions-api/', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+            "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://api.f1a.me/github-contributions-api/', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+            "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get('https://api.f1a.me/github-contributions-api/', headers=headers)\n"
           }
         },
         {
@@ -1192,11 +1192,11 @@ export const apiSpecs: ApiSpecsGenerated = {
             }
           ],
           "searchText": "redirectToRoot\n/v4\n重定向到根路径\n重定向到 API 根路径\ncontributions",
-          "curlExample": "curl -X GET 'https://github-contributions-api.jogruber.de/v4' -H 'Accept: application/json'",
+          "curlExample": "curl -X GET 'https://api.f1a.me/github-contributions-api/v4' -H 'Accept: application/json'",
           "codeExamples": {
-            "fetch": "import fetch from 'node-fetch';\n\nfetch('https://github-contributions-api.jogruber.de/v4', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
-            "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://github-contributions-api.jogruber.de/v4', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
-            "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get('https://github-contributions-api.jogruber.de/v4', headers=headers)\n"
+            "fetch": "import fetch from 'node-fetch';\n\nfetch('https://api.f1a.me/github-contributions-api/v4', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+            "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://api.f1a.me/github-contributions-api/v4', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+            "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get('https://api.f1a.me/github-contributions-api/v4', headers=headers)\n"
           }
         },
         {
@@ -1367,11 +1367,11 @@ export const apiSpecs: ApiSpecsGenerated = {
             }
           ],
           "searchText": "getUserContributions\n/v4/{username}\n获取用户的 GitHub 贡献数据\n根据 GitHub 用户名获取该用户的贡献历史数据。支持按年份筛选和嵌套格式输出。\n\n**缓存机制**：\n- 结果默认缓存 1 小时\n- 可通过 `cache-control: no-cache` 请求头强制刷新（请谨慎使用）\n- 响应头包含 `age` 和 `x-cache` 字段提供缓存状态信息\n\ncontributions",
-          "curlExample": "curl -X GET 'https://github-contributions-api.jogruber.de/v4/<username>?y=<y>&format=<format>' -H 'Accept: application/json'",
+          "curlExample": "curl -X GET 'https://api.f1a.me/github-contributions-api/v4/<username>?y=<y>&format=<format>' -H 'Accept: application/json'",
           "codeExamples": {
-            "fetch": "import fetch from 'node-fetch';\n\nfetch('https://github-contributions-api.jogruber.de/v4/<username>?y=<y>&format=<format>', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
-            "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://github-contributions-api.jogruber.de/v4/<username>?y=<y>&format=<format>', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
-            "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get('https://github-contributions-api.jogruber.de/v4/<username>?y=<y>&format=<format>', headers=headers)\n"
+            "fetch": "import fetch from 'node-fetch';\n\nfetch('https://api.f1a.me/github-contributions-api/v4/<username>?y=<y>&format=<format>', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+            "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://api.f1a.me/github-contributions-api/v4/<username>?y=<y>&format=<format>', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+            "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get('https://api.f1a.me/github-contributions-api/v4/<username>?y=<y>&format=<format>', headers=headers)\n"
           }
         }
       ]
@@ -1746,7 +1746,7 @@ export const apiSpecs: ApiSpecsGenerated = {
               "docs": {
                 "type": "string",
                 "format": "uri",
-                "example": "https://github-contributions-api.jogruber.de"
+                "example": "https://github.com/grubersjoe/github-contributions-api"
               }
             }
           },
@@ -1764,15 +1764,15 @@ export const apiSpecs: ApiSpecsGenerated = {
               }
             }
           },
-          "exampleJson": "{\n  \"message\": \"Welcome to the GitHub Contributions API.\",\n  \"version\": \"v4\",\n  \"docs\": \"https://github-contributions-api.jogruber.de\"\n}"
+          "exampleJson": "{\n  \"message\": \"Welcome to the GitHub Contributions API.\",\n  \"version\": \"v4\",\n  \"docs\": \"https://github.com/grubersjoe/github-contributions-api\"\n}"
         }
       ],
       "searchText": "getWelcome\n/\n获取 API 欢迎信息\n返回 API 的基本信息和文档链接\ncontributions",
-      "curlExample": "curl -X GET 'https://github-contributions-api.jogruber.de/' -H 'Accept: application/json'",
+      "curlExample": "curl -X GET 'https://api.f1a.me/github-contributions-api/' -H 'Accept: application/json'",
       "codeExamples": {
-        "fetch": "import fetch from 'node-fetch';\n\nfetch('https://github-contributions-api.jogruber.de/', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
-        "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://github-contributions-api.jogruber.de/', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
-        "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get('https://github-contributions-api.jogruber.de/', headers=headers)\n"
+        "fetch": "import fetch from 'node-fetch';\n\nfetch('https://api.f1a.me/github-contributions-api/', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+        "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://api.f1a.me/github-contributions-api/', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+        "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get('https://api.f1a.me/github-contributions-api/', headers=headers)\n"
       }
     },
     {
@@ -1795,11 +1795,11 @@ export const apiSpecs: ApiSpecsGenerated = {
         }
       ],
       "searchText": "redirectToRoot\n/v4\n重定向到根路径\n重定向到 API 根路径\ncontributions",
-      "curlExample": "curl -X GET 'https://github-contributions-api.jogruber.de/v4' -H 'Accept: application/json'",
+      "curlExample": "curl -X GET 'https://api.f1a.me/github-contributions-api/v4' -H 'Accept: application/json'",
       "codeExamples": {
-        "fetch": "import fetch from 'node-fetch';\n\nfetch('https://github-contributions-api.jogruber.de/v4', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
-        "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://github-contributions-api.jogruber.de/v4', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
-        "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get('https://github-contributions-api.jogruber.de/v4', headers=headers)\n"
+        "fetch": "import fetch from 'node-fetch';\n\nfetch('https://api.f1a.me/github-contributions-api/v4', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+        "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://api.f1a.me/github-contributions-api/v4', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+        "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get('https://api.f1a.me/github-contributions-api/v4', headers=headers)\n"
       }
     },
     {
@@ -1970,11 +1970,11 @@ export const apiSpecs: ApiSpecsGenerated = {
         }
       ],
       "searchText": "getUserContributions\n/v4/{username}\n获取用户的 GitHub 贡献数据\n根据 GitHub 用户名获取该用户的贡献历史数据。支持按年份筛选和嵌套格式输出。\n\n**缓存机制**：\n- 结果默认缓存 1 小时\n- 可通过 `cache-control: no-cache` 请求头强制刷新（请谨慎使用）\n- 响应头包含 `age` 和 `x-cache` 字段提供缓存状态信息\n\ncontributions",
-      "curlExample": "curl -X GET 'https://github-contributions-api.jogruber.de/v4/<username>?y=<y>&format=<format>' -H 'Accept: application/json'",
+      "curlExample": "curl -X GET 'https://api.f1a.me/github-contributions-api/v4/<username>?y=<y>&format=<format>' -H 'Accept: application/json'",
       "codeExamples": {
-        "fetch": "import fetch from 'node-fetch';\n\nfetch('https://github-contributions-api.jogruber.de/v4/<username>?y=<y>&format=<format>', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
-        "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://github-contributions-api.jogruber.de/v4/<username>?y=<y>&format=<format>', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
-        "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get('https://github-contributions-api.jogruber.de/v4/<username>?y=<y>&format=<format>', headers=headers)\n"
+        "fetch": "import fetch from 'node-fetch';\n\nfetch('https://api.f1a.me/github-contributions-api/v4/<username>?y=<y>&format=<format>', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+        "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://api.f1a.me/github-contributions-api/v4/<username>?y=<y>&format=<format>', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+        "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get('https://api.f1a.me/github-contributions-api/v4/<username>?y=<y>&format=<format>', headers=headers)\n"
       }
     }
   ]

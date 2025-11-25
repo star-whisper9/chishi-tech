@@ -10,10 +10,10 @@ info:
     url: https://github.com/grubersjoe/github-contributions-api
 
 servers:
-  - url: https://github-contributions-api.jogruber.de
-    description: 原版官方托管
   - url: https://api.f1a.me/github-contributions-api
     description: 赤石科技镜像托管
+  - url: https://github-contributions-api.jogruber.de
+    description: 原版官方托管
 
 tags:
   - name: contributions
@@ -44,7 +44,7 @@ paths:
                   docs:
                     type: string
                     format: uri
-                    example: https://github-contributions-api.jogruber.de
+                    example: https://github.com/grubersjoe/github-contributions-api
 
   /v4:
     get:

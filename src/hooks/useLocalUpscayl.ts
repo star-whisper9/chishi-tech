@@ -142,6 +142,20 @@ export const useLocalUpscayl = () => {
       alphaOutCtx.imageSmoothingEnabled = true;
       alphaOutCtx.imageSmoothingQuality = "high";
 
+      // Reuse tile canvases to reduce DOM churn and GC pressure
+      const maxTileSize = tileSize + PREPADDING * 2;
+      const tileCanvas = document.createElement("canvas");
+      tileCanvas.width = maxTileSize;
+      tileCanvas.height = maxTileSize;
+      const tileCtx = tileCanvas.getContext("2d", { willReadFrequently: true });
+      if (!tileCtx) throw new Error("Could not get tile canvas context");
+
+      const outTileCanvas = document.createElement("canvas");
+      outTileCanvas.width = maxTileSize * SCALE;
+      outTileCanvas.height = maxTileSize * SCALE;
+      let outTileCtx = outTileCanvas.getContext("2d");
+      if (!outTileCtx) throw new Error("Could not get output tile context");
+
       let processedTiles = 0;
 
       for (let yi = 0; yi < rows; yi++) {
@@ -159,15 +173,6 @@ export const useLocalUpscayl = () => {
 
           const paddedW = tileX1 - tileX0;
           const paddedH = tileY1 - tileY0;
-
-          // 创建带 padding 的 tile
-          const tileCanvas = document.createElement("canvas");
-          tileCanvas.width = paddedW;
-          tileCanvas.height = paddedH;
-          const tileCtx = tileCanvas.getContext("2d", {
-            willReadFrequently: true,
-          });
-          if (!tileCtx) throw new Error("Could not get tile canvas context");
 
           const tileImageData = tileCtx.createImageData(paddedW, paddedH);
           const tilePixels = tileImageData.data;
@@ -196,76 +201,86 @@ export const useLocalUpscayl = () => {
 
           tileCtx.putImageData(tileImageData, 0, 0);
 
-          // 转换为 tensor
           const tileForInference = tileCtx.getImageData(0, 0, paddedW, paddedH);
           const tensorData = imageDataToTensor(tileForInference);
-          const tensor = new ort.Tensor("float32", tensorData, [
-            1,
-            3,
-            paddedH,
-            paddedW,
-          ]);
 
-          // 运行推理
-          const feeds = { [session.inputNames[0]]: tensor };
-          const results = await session.run(feeds);
-          const output = results[session.outputNames[0]];
-          const outputData = output.data as Float32Array;
+          let inputTensor: ort.Tensor | null = null;
+          let outputTensor: ort.Tensor | null = null;
 
-          // 输出 tile 的尺寸
-          const out_padded_w = paddedW * SCALE;
-          const out_padded_h = paddedH * SCALE;
+          try {
+            inputTensor = new ort.Tensor("float32", tensorData, [
+              1,
+              3,
+              paddedH,
+              paddedW,
+            ]);
 
-          // 转换回 ImageData
-          const outTileImageData = tensorToImageData(
-            outputData,
-            out_padded_w,
-            out_padded_h
-          );
+            const feeds = { [session.inputNames[0]]: inputTensor };
+            const results = await session.run(feeds);
+            outputTensor = results[session.outputNames[0]];
+            const outputData = outputTensor.data as Float32Array;
 
-          // 创建输出 tile 的 canvas
-          const outTileCanvas = document.createElement("canvas");
-          outTileCanvas.width = out_padded_w;
-          outTileCanvas.height = out_padded_h;
-          const outTileCtx = outTileCanvas.getContext("2d");
-          if (!outTileCtx) throw new Error("Could not get output tile context");
-          outTileCtx.putImageData(outTileImageData, 0, 0);
+            const out_padded_w = paddedW * SCALE;
+            const out_padded_h = paddedH * SCALE;
 
-          // 计算需要裁剪的区域（去除 padding）
-          // 只有当 tile 不在边界时才需要裁剪 padding
-          const crop_x = PREPADDING * SCALE;
-          const crop_y = PREPADDING * SCALE;
-          const src_crop_w = tileWidthNoPad * SCALE;
-          const src_crop_h = tileHeightNoPad * SCALE;
+            const outTileImageData = tensorToImageData(
+              outputData,
+              out_padded_w,
+              out_padded_h
+            );
 
-          const dst_x = tileX * SCALE;
-          const dst_y = tileY * SCALE;
+            if (
+              outTileCanvas.width !== out_padded_w ||
+              outTileCanvas.height !== out_padded_h
+            ) {
+              outTileCanvas.width = out_padded_w;
+              outTileCanvas.height = out_padded_h;
+              outTileCtx = outTileCanvas.getContext("2d");
+              if (!outTileCtx)
+                throw new Error("Could not get output tile context");
+            }
 
-          // 绘制到最终输出画布
-          outCtx.drawImage(
-            outTileCanvas,
-            crop_x,
-            crop_y,
-            src_crop_w,
-            src_crop_h, // 源区域（裁剪后）
-            dst_x,
-            dst_y,
-            src_crop_w,
-            src_crop_h // 目标区域
-          );
+            outTileCtx.putImageData(outTileImageData, 0, 0);
 
-          // 同步处理 alpha：不加 padding，直接对 tile 区域做平滑放大
-          alphaOutCtx.drawImage(
-            srcCanvas,
-            tileX,
-            tileY,
-            tileWidthNoPad,
-            tileHeightNoPad,
-            dst_x,
-            dst_y,
-            src_crop_w,
-            src_crop_h
-          );
+            // 计算需要裁剪的区域（去除 padding）
+            // 只有当 tile 不在边界时才需要裁剪 padding
+            const crop_x = PREPADDING * SCALE;
+            const crop_y = PREPADDING * SCALE;
+            const src_crop_w = tileWidthNoPad * SCALE;
+            const src_crop_h = tileHeightNoPad * SCALE;
+
+            const dst_x = tileX * SCALE;
+            const dst_y = tileY * SCALE;
+
+            // 绘制到最终输出画布
+            outCtx.drawImage(
+              outTileCanvas,
+              crop_x,
+              crop_y,
+              src_crop_w,
+              src_crop_h, // 源区域（裁剪后）
+              dst_x,
+              dst_y,
+              src_crop_w,
+              src_crop_h // 目标区域
+            );
+
+            // 同步处理 alpha：不加 padding，直接对 tile 区域做平滑放大
+            alphaOutCtx.drawImage(
+              srcCanvas,
+              tileX,
+              tileY,
+              tileWidthNoPad,
+              tileHeightNoPad,
+              dst_x,
+              dst_y,
+              src_crop_w,
+              src_crop_h
+            );
+          } finally {
+            if (inputTensor) inputTensor.dispose();
+            if (outputTensor) outputTensor.dispose();
+          }
 
           processedTiles++;
           onProgress((processedTiles / totalTiles) * 100);

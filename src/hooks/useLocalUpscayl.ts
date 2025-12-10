@@ -118,6 +118,16 @@ export const useLocalUpscayl = () => {
       const srcImageData = srcCtx.getImageData(0, 0, img.width, img.height);
       const srcPixels = srcImageData.data;
 
+      // Alpha 通道输出画布，按 tile 区域无 padding 放大（与 C 端一致）
+      const alphaOutCanvas = document.createElement("canvas");
+      alphaOutCanvas.width = img.width * SCALE;
+      alphaOutCanvas.height = img.height * SCALE;
+      const alphaOutCtx = alphaOutCanvas.getContext("2d");
+      if (!alphaOutCtx)
+        throw new Error("Could not get alpha output canvas context");
+      alphaOutCtx.imageSmoothingEnabled = true;
+      alphaOutCtx.imageSmoothingQuality = "high";
+
       let processedTiles = 0;
 
       for (let yi = 0; yi < rows; yi++) {
@@ -230,6 +240,19 @@ export const useLocalUpscayl = () => {
             src_crop_h // 目标区域
           );
 
+          // 同步处理 alpha：不加 padding，直接对 tile 区域做平滑放大
+          alphaOutCtx.drawImage(
+            srcCanvas,
+            tileX,
+            tileY,
+            tileWidthNoPad,
+            tileHeightNoPad,
+            dst_x,
+            dst_y,
+            src_crop_w,
+            src_crop_h
+          );
+
           processedTiles++;
           onProgress((processedTiles / totalTiles) * 100);
 
@@ -237,6 +260,27 @@ export const useLocalUpscayl = () => {
           await new Promise((r) => setTimeout(r, 0));
         }
       }
+
+      const alphaData = alphaOutCtx.getImageData(
+        0,
+        0,
+        alphaOutCanvas.width,
+        alphaOutCanvas.height
+      );
+      const outImageData = outCtx.getImageData(
+        0,
+        0,
+        outCanvas.width,
+        outCanvas.height
+      );
+      const alphaPixels = alphaData.data;
+      const outPixels = outImageData.data;
+
+      for (let i = 0; i < outPixels.length; i += 4) {
+        outPixels[i + 3] = alphaPixels[i + 3];
+      }
+
+      outCtx.putImageData(outImageData, 0, 0);
 
       return outCanvas.toDataURL("image/png");
     },

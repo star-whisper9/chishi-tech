@@ -25,4 +25,25 @@ export const CONSTS = {
     MIN_PERCENT: 0.00001,
     MAX_PERCENT: 0.01,
   },
+  // Upscayl 图像放大功能配置
+  UPSCAYL: {
+    // API 基础路径（默认为相对路径，生产环境需配置完整 URL）
+    API_BASE_URL: "http://localhost:3000/api",
+    // 支持的图片格式（MIME types）
+    SUPPORTED_FORMATS: ["image/png", "image/jpeg", "image/webp"],
+    // 支持的图片文件扩展名
+    SUPPORTED_EXTENSIONS: [".png", ".jpg", ".jpeg", ".webp"],
+    // 最大文件大小（字节），默认 20 MiB
+    MAX_FILE_SIZE_BYTES: 20 * 1024 * 1024,
+    // 默认放大倍数
+    DEFAULT_SCALE: 4,
+    // 支持的放大倍数选项
+    SCALE_OPTIONS: [2, 3, 4],
+    // 默认模型
+    DEFAULT_MODEL: "upscayl-standard-4x",
+    // 队列状态轮询间隔（毫秒）
+    POLL_INTERVAL_MS: 2000,
+    // 最大轮询次数（防止无限轮询）
+    MAX_POLL_COUNT: 300, // 10 分钟
+  },
 } as const;

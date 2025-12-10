@@ -52,4 +52,18 @@ export const pages: Page[] = [
     link: "/videoconvertor",
     shit: false,
   },
+  {
+    title: "图像放大",
+    icon: (
+      <img
+        src="/256.png"
+        alt="Upscayl"
+        style={{ width: 28, height: 28, objectFit: "contain" }}
+      />
+    ),
+    description: "使用 AI 模型放大图片，提升图片质量。",
+    lastUpdated: "2025-12-10",
+    link: "/upscayl",
+    shit: false,
+  },
 ];

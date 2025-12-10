@@ -16,6 +16,11 @@ import {
   Paper,
   IconButton,
   Grid,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Tooltip,
 } from "@mui/material";
 import {
   CloudUploadRounded,
@@ -26,6 +31,10 @@ import {
   MemoryRounded,
   SpeedRounded,
   ScienceRounded,
+  HelpOutlineRounded,
+  DataUsageRounded,
+  TimerRounded,
+  CompareArrowsRounded,
 } from "@mui/icons-material";
 import { useLocalUpscayl } from "../../../hooks/useLocalUpscayl";
 import { CONSTS } from "../../../config/consts";
@@ -52,6 +61,7 @@ const LocalUpscaylPanel: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [targetScale, setTargetScale] = useState<number>(4);
+  const [openHelp, setOpenHelp] = useState(false);
 
   useEffect(() => {
     if (availableModels.length > 0 && !selectedModelPath) {
@@ -130,9 +140,14 @@ const LocalUpscaylPanel: React.FC = () => {
     <Stack spacing={3}>
       <Card>
         <CardContent>
-          <Typography variant="h6" gutterBottom>
-            本地模型配置
-          </Typography>
+          <Stack direction="row" alignItems="center" spacing={1} sx={{ mb: 2 }}>
+            <Typography variant="h6">本地模型配置</Typography>
+            <Tooltip title="查看帮助与说明">
+              <IconButton size="small" onClick={() => setOpenHelp(true)}>
+                <HelpOutlineRounded />
+              </IconButton>
+            </Tooltip>
+          </Stack>
           <Grid container spacing={3} alignItems="center">
             <Grid size={{ xs: 12, md: 8 }}>
               <FormControl fullWidth disabled={modelLoading || processing}>
@@ -176,7 +191,7 @@ const LocalUpscaylPanel: React.FC = () => {
                   ? "加载中..."
                   : isModelLoaded
                   ? "模型已加载"
-                  : "加载模型"}
+                  : "加载模型(约1-2分钟)"}
               </Button>
             </Grid>
           </Grid>
@@ -386,6 +401,109 @@ const LocalUpscaylPanel: React.FC = () => {
           </CardContent>
         </Card>
       )}
+
+      <Dialog
+        open={openHelp}
+        onClose={() => setOpenHelp(false)}
+        maxWidth="sm"
+        fullWidth
+      >
+        <DialogTitle>本地模型使用说明</DialogTitle>
+        <DialogContent dividers>
+          <Stack spacing={2}>
+            <Box>
+              <Typography
+                variant="subtitle2"
+                gutterBottom
+                sx={{ display: "flex", alignItems: "center", gap: 1 }}
+              >
+                <DataUsageRounded fontSize="small" color="primary" />{" "}
+                模型加载流量
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                首次加载模型需要下载模型文件和 WASM 运行时：
+              </Typography>
+              <ul style={{ margin: "4px 0", paddingLeft: 20 }}>
+                <li>
+                  <Typography variant="body2" color="text.secondary">
+                    RealESRGAN x4 Plus: 约 73MB
+                  </Typography>
+                </li>
+                <li>
+                  <Typography variant="body2" color="text.secondary">
+                    RealESRGAN x4 Plus Anime 6B: 约 25MB
+                  </Typography>
+                </li>
+              </ul>
+            </Box>
+
+            <Box>
+              <Typography
+                variant="subtitle2"
+                gutterBottom
+                sx={{ display: "flex", alignItems: "center", gap: 1 }}
+              >
+                <TimerRounded fontSize="small" color="primary" /> 耗时说明
+              </Typography>
+              <Typography variant="body2" color="text.secondary" paragraph>
+                <strong>加载耗时：</strong> 取决于网络状况，通常需要 1
+                分钟左右。
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                <strong>处理耗时：</strong> 1000x1000 像素图像进行 4x
+                放大，在主流硬件上约需 30 秒。
+              </Typography>
+            </Box>
+
+            <Box>
+              <Typography
+                variant="subtitle2"
+                gutterBottom
+                sx={{ display: "flex", alignItems: "center", gap: 1 }}
+              >
+                <ScienceRounded fontSize="small" color="primary" /> WebGPU 支持
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                推荐使用支持 WebGPU 的浏览器（如 Chrome 113+）以获得最佳性能。
+                如果不支持，将回退到 WASM 模式，速度会显著变慢。
+              </Typography>
+            </Box>
+
+            <Box>
+              <Typography
+                variant="subtitle2"
+                gutterBottom
+                sx={{ display: "flex", alignItems: "center", gap: 1 }}
+              >
+                <CompareArrowsRounded fontSize="small" color="primary" />{" "}
+                倍率与性能
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                所有倍率均基于 4x 模型推理：
+              </Typography>
+              <ul style={{ margin: "4px 0", paddingLeft: 20 }}>
+                <li>
+                  <Typography variant="body2" color="text.secondary">
+                    1x - 3x: 通过 4x 推理后降采样实现。
+                  </Typography>
+                </li>
+                <li>
+                  <Typography variant="body2" color="text.secondary">
+                    16x: 执行两次 4x 推理。
+                  </Typography>
+                </li>
+              </ul>
+              <Alert severity="warning" sx={{ mt: 1 }}>
+                <strong>注意：</strong> 16x
+                放大非常缓慢，极易导致浏览器卡顿或超时。仅推荐用于非常小的图片测试。
+              </Alert>
+            </Box>
+          </Stack>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenHelp(false)}>关闭</Button>
+        </DialogActions>
+      </Dialog>
     </Stack>
   );
 };

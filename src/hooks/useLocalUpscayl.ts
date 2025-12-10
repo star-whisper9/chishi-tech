@@ -24,7 +24,7 @@ const dataUrlToImage = (dataUrl: string): Promise<HTMLImageElement> =>
   });
 
 ort.env.wasm.wasmPaths =
-  "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.23.2/dist/";
+  "https://cdn.jsdmirror.com/npm/onnxruntime-web@1.23.2/dist/";
 
 export interface LocalModel {
   name: string;
@@ -35,12 +35,12 @@ export interface LocalModel {
 export const LOCAL_MODELS: LocalModel[] = [
   {
     name: "RealESRGAN x4 Plus",
-    path: "/models/RealESRGAN_x4plus.onnx",
+    path: "https://www.modelscope.cn/models/starwhisper9/Real-ESRGAN-onnx/resolve/master/RealESRGAN_x4plus.onnx",
     description: "适用于大部分图的放大模型（x4）",
   },
   {
     name: "RealESRGAN x4 Plus Anime 6B",
-    path: "/models/RealESRGAN_x4plus_anime_6B.onnx",
+    path: "https://www.modelscope.cn/models/starwhisper9/Real-ESRGAN-onnx/resolve/master/RealESRGAN_x4plus_anime_6B.onnx",
     description: "适用于动漫插画的小尺寸优化模型（x4）",
   },
 ];

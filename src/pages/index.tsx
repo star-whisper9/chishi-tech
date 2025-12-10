@@ -1,5 +1,9 @@
 import React from "react";
-import { QrCode2Rounded, VideoFileRounded } from "@mui/icons-material";
+import {
+  AspectRatio,
+  QrCode2Rounded,
+  VideoFileRounded,
+} from "@mui/icons-material";
 import VideocamOffRoundedIcon from "@mui/icons-material/VideocamOffRounded";
 // 位图两种使用方式：
 // 1) public 下直接 /xxx.png 访问（不指纹）
@@ -54,13 +58,7 @@ export const pages: Page[] = [
   },
   {
     title: "图像放大",
-    icon: (
-      <img
-        src="/256.png"
-        alt="Upscayl"
-        style={{ width: 28, height: 28, objectFit: "contain" }}
-      />
-    ),
+    icon: <AspectRatio color="primary" fontSize="large" />,
     description: "使用 AI 模型放大图片，提升图片质量。",
     lastUpdated: "2025-12-10",
     link: "/upscayl",

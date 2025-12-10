@@ -36,11 +36,11 @@ export const CONSTS = {
     // 最大文件大小（字节），默认 20 MiB
     MAX_FILE_SIZE_BYTES: 20 * 1024 * 1024,
     // 默认放大倍数
-    DEFAULT_SCALE: 4,
+    DEFAULT_SCALE: 2,
     // 支持的放大倍数选项
     SCALE_OPTIONS: [2, 3, 4],
     // 默认模型
-    DEFAULT_MODEL: "upscayl-standard-4x",
+    DEFAULT_MODEL: "未选择模型",
     // 队列状态轮询间隔（毫秒）
     POLL_INTERVAL_MS: 2000,
     // 最大轮询次数（防止无限轮询）

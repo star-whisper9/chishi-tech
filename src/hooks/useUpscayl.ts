@@ -13,6 +13,7 @@ export interface UpscaylModel {
   req_name: string; // 请求时使用的字段
   name: string; // 显示名称
   description: string; // 描述
+  is_default?: boolean; // 是否为默认模型
 }
 
 export interface UpscaylResponse {
@@ -104,6 +105,15 @@ export const useUpscayl = (): UseUpscaylReturn => {
         : [];
 
       setModels(modelList);
+
+      // 自动选择默认模型
+      if (modelList.length > 0) {
+        const defaultModel = modelList.find((m) => m.is_default === true);
+        if (defaultModel) {
+          setSelectedModel(defaultModel.req_name);
+        }
+      }
+
       setError(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "获取模型列表失败");

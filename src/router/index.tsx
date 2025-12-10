@@ -7,6 +7,7 @@ const ExamplePage = lazy(() => import("../pages/Example"));
 const QrClockPage = lazy(() => import("../pages/QrClock"));
 const BadVideoPage = lazy(() => import("../pages/BadVideo"));
 const VideoConvertorPage = lazy(() => import("../pages/VideoConvertor"));
+const UpscaylPage = lazy(() => import("../pages/Upscayl"));
 const ApiListPage = lazy(() => import("../pages/ApiList"));
 const ApiDetailPage = lazy(() => import("../pages/ApiDetail"));
 
@@ -40,6 +41,10 @@ export const router = createBrowserRouter([
   {
     path: "/videoconvertor",
     element: withSuspense(VideoConvertorPage),
+  },
+  {
+    path: "/upscayl",
+    element: withSuspense(UpscaylPage),
   },
   {
     path: "/api",

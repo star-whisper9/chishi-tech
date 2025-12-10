@@ -1,5 +1,9 @@
 import React from "react";
-import { QrCode2Rounded, VideoFileRounded } from "@mui/icons-material";
+import {
+  AspectRatio,
+  QrCode2Rounded,
+  VideoFileRounded,
+} from "@mui/icons-material";
 import VideocamOffRoundedIcon from "@mui/icons-material/VideocamOffRounded";
 // 位图两种使用方式：
 // 1) public 下直接 /xxx.png 访问（不指纹）
@@ -50,6 +54,14 @@ export const pages: Page[] = [
     description: "在本地快捷转换视频格式，同时支持视频转动图。",
     lastUpdated: "2025-10-11",
     link: "/videoconvertor",
+    shit: false,
+  },
+  {
+    title: "图像放大",
+    icon: <AspectRatio color="primary" fontSize="large" />,
+    description: "使用 AI 模型放大图片，提升图片质量。",
+    lastUpdated: "2025-12-10",
+    link: "/upscayl",
     shit: false,
   },
 ];

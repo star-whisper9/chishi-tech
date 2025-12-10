@@ -290,11 +290,17 @@ const LocalUpscaylPanel: React.FC = () => {
                       value={targetScale}
                       onChange={(e) => setTargetScale(Number(e.target.value))}
                     >
-                      {[1, 2, 3, 4].map((s) => (
+                      {[1, 2, 3, 4, 16].map((s) => (
                         <MenuItem key={s} value={s}>{`${s}x`}</MenuItem>
                       ))}
                     </Select>
                   </FormControl>
+
+                  {targetScale === 16 && (
+                    <Alert severity="warning" sx={{ mt: 1 }}>
+                      16x 将执行两次 4x 推理，耗时较长且占用内存更高。
+                    </Alert>
+                  )}
 
                   <Button
                     fullWidth

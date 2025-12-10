@@ -34,14 +34,14 @@ export interface LocalModel {
 
 export const LOCAL_MODELS: LocalModel[] = [
   {
-    name: "RealESRGAN_x4plus",
+    name: "RealESRGAN x4 Plus",
     path: "/models/RealESRGAN_x4plus.onnx",
-    description: "General purpose upscaling model (x4)",
+    description: "适用于大部分图的放大模型（x4）",
   },
   {
-    name: "RealESRGAN_x4plus_anime_6B",
+    name: "RealESRGAN x4 Plus Anime 6B",
     path: "/models/RealESRGAN_x4plus_anime_6B.onnx",
-    description: "Optimized for anime images (x4)",
+    description: "适用于动漫插画的小尺寸优化模型（x4）",
   },
 ];
 
@@ -307,6 +307,25 @@ export const useLocalUpscayl = () => {
     []
   );
 
+  const computeTileSize = useCallback((img: HTMLImageElement) => {
+    const maxDimension = Math.max(img.width, img.height);
+    let tileSize = 200;
+
+    if (maxDimension <= 800) {
+      tileSize = Math.min(200, maxDimension);
+    } else if (maxDimension <= 1500) {
+      tileSize = 200;
+    } else if (maxDimension <= 2500) {
+      tileSize = 128;
+    } else if (maxDimension <= 4000) {
+      tileSize = 100;
+    } else {
+      tileSize = 64;
+    }
+
+    return tileSize;
+  }, []);
+
   const upscale = useCallback(
     async (file: File, targetScale: number = SCALE) => {
       if (!session) {
@@ -314,8 +333,8 @@ export const useLocalUpscayl = () => {
         return;
       }
 
-      if (![1, 2, 3, 4].includes(targetScale)) {
-        setError("Unsupported target scale. Use 1, 2, 3, or 4.");
+      if (![1, 2, 3, 4, 16].includes(targetScale)) {
+        setError("Unsupported target scale. Use 1, 2, 3, 4, or 16.");
         return;
       }
 
@@ -330,37 +349,43 @@ export const useLocalUpscayl = () => {
         const img = await fileToImage(file);
         const startTs = performance.now();
 
-        // 自适应 tile 大小，沿用原生 realesrgan 的 200/128/100/64 框架
-        const maxDimension = Math.max(img.width, img.height);
-        let tileSize = 200;
+        const runPass = async (
+          inputImg: HTMLImageElement,
+          progressMapper: (p: number) => void
+        ) => {
+          const tileSize = computeTileSize(inputImg);
+          console.log(
+            `Image size: ${inputImg.width}x${inputImg.height}, using tile size: ${tileSize}`
+          );
+          return runTiledInference(
+            session,
+            inputImg,
+            tileSize,
+            progressMapper,
+            () => abortRef.current
+          );
+        };
 
-        if (maxDimension <= 800) {
-          tileSize = Math.min(200, maxDimension);
-        } else if (maxDimension <= 1500) {
-          tileSize = 200;
-        } else if (maxDimension <= 2500) {
-          tileSize = 128;
-        } else if (maxDimension <= 4000) {
-          tileSize = 100;
+        let url: string | null = null;
+
+        if (targetScale === 16) {
+          url = await runPass(img, (p) => setProgress(p * 0.5));
+          if (!url) {
+            setError("Upscaling cancelled");
+            setDurationMs(performance.now() - startTs);
+            return;
+          }
+
+          const midImg = await dataUrlToImage(url);
+          url = await runPass(midImg, (p) => setProgress(50 + p * 0.5));
         } else {
-          tileSize = 64;
+          url = await runPass(img, setProgress);
         }
 
-        console.log(
-          `Image size: ${img.width}x${img.height}, using tile size: ${tileSize}`
-        );
-
-        const url = await runTiledInference(
-          session,
-          img,
-          tileSize,
-          setProgress,
-          () => abortRef.current
-        );
         if (url) {
           let finalUrl = url;
 
-          if (targetScale !== SCALE) {
+          if (targetScale !== SCALE && targetScale !== 16) {
             const upscaledImg = await dataUrlToImage(url);
             const ratio = targetScale / SCALE;
             const downCanvas = document.createElement("canvas");
@@ -400,7 +425,7 @@ export const useLocalUpscayl = () => {
         setProcessing(false);
       }
     },
-    [session, runTiledInference]
+    [session, runTiledInference, computeTileSize]
   );
 
   const cancel = useCallback(() => {

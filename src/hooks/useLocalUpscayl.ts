@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import * as ort from "onnxruntime-web";
 import {
   fileToImage,
@@ -14,6 +14,14 @@ const mirrorCoordinate = (coord: number, max: number): number => {
   const mirrored = Math.abs(coord);
   return max - 1 - Math.abs(mirrored - (max - 1));
 };
+
+const dataUrlToImage = (dataUrl: string): Promise<HTMLImageElement> =>
+  new Promise((resolve, reject) => {
+    const img = new Image();
+    img.onload = () => resolve(img);
+    img.onerror = reject;
+    img.src = dataUrl;
+  });
 
 ort.env.wasm.wasmPaths =
   "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.23.2/dist/";
@@ -46,6 +54,9 @@ export const useLocalUpscayl = () => {
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [currentModelPath, setCurrentModelPath] = useState<string | null>(null);
   const [executionProvider, setExecutionProvider] = useState<string>("unknown");
+  const [durationMs, setDurationMs] = useState<number | null>(null);
+
+  const abortRef = useRef(false);
 
   const loadModel = useCallback(
     async (modelPath: string) => {
@@ -91,8 +102,11 @@ export const useLocalUpscayl = () => {
       session: ort.InferenceSession,
       img: HTMLImageElement,
       tileSize: number,
-      onProgress: (progress: number) => void
-    ): Promise<string> => {
+      onProgress: (progress: number) => void,
+      isCanceled: () => boolean
+    ): Promise<string | null> => {
+      if (isCanceled()) return null;
+
       const cols = Math.ceil(img.width / tileSize);
       const rows = Math.ceil(img.height / tileSize);
       const totalTiles = cols * rows;
@@ -256,6 +270,10 @@ export const useLocalUpscayl = () => {
           processedTiles++;
           onProgress((processedTiles / totalTiles) * 100);
 
+          if (isCanceled()) {
+            return null;
+          }
+
           // 让出控制权，避免阻塞 UI
           await new Promise((r) => setTimeout(r, 0));
         }
@@ -282,15 +300,22 @@ export const useLocalUpscayl = () => {
 
       outCtx.putImageData(outImageData, 0, 0);
 
+      if (isCanceled()) return null;
+
       return outCanvas.toDataURL("image/png");
     },
     []
   );
 
   const upscale = useCallback(
-    async (file: File) => {
+    async (file: File, targetScale: number = SCALE) => {
       if (!session) {
         setError("Model not loaded");
+        return;
+      }
+
+      if (![1, 2, 3, 4].includes(targetScale)) {
+        setError("Unsupported target scale. Use 1, 2, 3, or 4.");
         return;
       }
 
@@ -298,9 +323,12 @@ export const useLocalUpscayl = () => {
       setProgress(0);
       setError(null);
       setResultUrl(null);
+      setDurationMs(null);
+      abortRef.current = false;
 
       try {
         const img = await fileToImage(file);
+        const startTs = performance.now();
 
         // 自适应 tile 大小，沿用原生 realesrgan 的 200/128/100/64 框架
         const maxDimension = Math.max(img.width, img.height);
@@ -326,10 +354,44 @@ export const useLocalUpscayl = () => {
           session,
           img,
           tileSize,
-          setProgress
+          setProgress,
+          () => abortRef.current
         );
-        setResultUrl(url);
-        setProgress(100);
+        if (url) {
+          let finalUrl = url;
+
+          if (targetScale !== SCALE) {
+            const upscaledImg = await dataUrlToImage(url);
+            const ratio = targetScale / SCALE;
+            const downCanvas = document.createElement("canvas");
+            downCanvas.width = upscaledImg.width * ratio;
+            downCanvas.height = upscaledImg.height * ratio;
+            const downCtx = downCanvas.getContext("2d");
+            if (!downCtx)
+              throw new Error("Could not get downscale canvas context");
+            downCtx.imageSmoothingEnabled = true;
+            downCtx.imageSmoothingQuality = "high";
+            downCtx.drawImage(
+              upscaledImg,
+              0,
+              0,
+              upscaledImg.width,
+              upscaledImg.height,
+              0,
+              0,
+              downCanvas.width,
+              downCanvas.height
+            );
+            finalUrl = downCanvas.toDataURL("image/png");
+          }
+
+          setResultUrl(finalUrl);
+          setProgress(100);
+          setDurationMs(performance.now() - startTs);
+        } else {
+          setError("Upscaling cancelled");
+          setDurationMs(performance.now() - startTs);
+        }
       } catch (e) {
         console.error(e);
         const errorMessage = e instanceof Error ? e.message : String(e);
@@ -341,6 +403,10 @@ export const useLocalUpscayl = () => {
     [session, runTiledInference]
   );
 
+  const cancel = useCallback(() => {
+    abortRef.current = true;
+  }, []);
+
   const clearResult = useCallback(() => {
     setResultUrl(null);
     setError(null);
@@ -351,11 +417,13 @@ export const useLocalUpscayl = () => {
     loadModel,
     upscale,
     clearResult,
+    cancel,
     modelLoading,
     processing,
     progress,
     error,
     resultUrl,
+    durationMs,
     currentModelPath,
     executionProvider,
     availableModels: LOCAL_MODELS,

@@ -36,6 +36,7 @@ const LocalUpscaylPanel: React.FC = () => {
     loadModel,
     upscale,
     clearResult,
+    cancel,
     modelLoading,
     processing,
     progress,
@@ -44,11 +45,13 @@ const LocalUpscaylPanel: React.FC = () => {
     currentModelPath,
     executionProvider,
     availableModels,
+    durationMs,
   } = useLocalUpscayl();
 
   const [selectedModelPath, setSelectedModelPath] = useState<string>("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+  const [targetScale, setTargetScale] = useState<number>(4);
 
   useEffect(() => {
     if (availableModels.length > 0 && !selectedModelPath) {
@@ -106,7 +109,7 @@ const LocalUpscaylPanel: React.FC = () => {
 
   const handleUpscale = () => {
     if (selectedFile) {
-      upscale(selectedFile);
+      upscale(selectedFile, targetScale);
     }
   };
 
@@ -279,15 +282,30 @@ const LocalUpscaylPanel: React.FC = () => {
 
                 <Divider sx={{ my: 2 }} />
 
-                <Button
-                  fullWidth
-                  variant="contained"
-                  startIcon={<CloudUploadRounded />}
-                  onClick={handleUpscale}
-                  disabled={!isModelLoaded || processing || !selectedFile}
-                >
-                  {processing ? "处理中..." : "开始放大 (4x)"}
-                </Button>
+                <Stack spacing={2}>
+                  <FormControl fullWidth disabled={processing}>
+                    <InputLabel>目标倍率</InputLabel>
+                    <Select
+                      label="目标倍率"
+                      value={targetScale}
+                      onChange={(e) => setTargetScale(Number(e.target.value))}
+                    >
+                      {[1, 2, 3, 4].map((s) => (
+                        <MenuItem key={s} value={s}>{`${s}x`}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+
+                  <Button
+                    fullWidth
+                    variant="contained"
+                    startIcon={<CloudUploadRounded />}
+                    onClick={handleUpscale}
+                    disabled={!isModelLoaded || processing || !selectedFile}
+                  >
+                    {processing ? "处理中..." : `开始放大 (${targetScale}x)`}
+                  </Button>
+                </Stack>
               </Box>
             )}
           </Stack>
@@ -306,6 +324,19 @@ const LocalUpscaylPanel: React.FC = () => {
               variant={progress > 0 ? "determinate" : "indeterminate"}
               value={progress}
             />
+            <Stack
+              direction="row"
+              justifyContent="space-between"
+              alignItems="center"
+              sx={{ mt: 1 }}
+            >
+              <Typography variant="caption" color="text.secondary">
+                {progress.toFixed(1)}%
+              </Typography>
+              <Button size="small" onClick={cancel} disabled={!processing}>
+                取消
+              </Button>
+            </Stack>
           </CardContent>
         </Card>
       )}
@@ -317,6 +348,11 @@ const LocalUpscaylPanel: React.FC = () => {
               <Typography variant="h6" color="success.main">
                 放大完成！
               </Typography>
+              {durationMs != null && (
+                <Typography variant="body2" color="text.secondary">
+                  用时：{durationMs.toFixed(0)} ms
+                </Typography>
+              )}
               <ImageCompareSlider
                 originalUrl={previewUrl}
                 upscaledUrl={resultUrl}

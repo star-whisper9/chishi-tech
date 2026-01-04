@@ -1,4 +1,4 @@
-import{r as n}from"./index-DePat01i.js";const c={bundles:[{service:"example",version:"v1",raw:{openapi:"3.1.0",info:{title:"全特性测试服务",description:"用于测试 generateApiSpecs.ts 解析能力的演示文档。",version:"1.0.0"},servers:[{url:"https://api.example.com/v1",description:"生产环境"}],components:{schemas:{User:{type:"object",required:["id","username"],properties:{id:{type:"integer",example:1001},username:{type:"string",example:"star_whisper"},role:{type:"string",enum:["admin","user","guest"],example:"admin"}}},Order:{type:"object",properties:{orderId:{type:"string",example:"ORD-2025-8888"},buyer:{$ref:"#/components/schemas/User"},items:{type:"array",items:{type:"object",properties:{productId:{type:"integer",example:99},name:{type:"string",example:"高级机械键盘"},tags:{type:"array",items:{type:"string",example:"数码"}}}}}}}}},paths:{"/orders/{orderId}":{get:{operationId:"getOrderDetail",summary:"获取订单详情",description:`测试点：
+import{r}from"./index-CYJ5CfpZ.js";const m={bundles:[{service:"example",version:"v1",raw:{openapi:"3.1.0",info:{title:"全特性测试服务",description:"用于测试 generateApiSpecs.ts 解析能力的演示文档。",version:"1.0.0"},servers:[{url:"https://api.example.com/v1",description:"生产环境"}],components:{schemas:{User:{type:"object",required:["id","username"],properties:{id:{type:"integer",example:1001},username:{type:"string",example:"star_whisper"},role:{type:"string",enum:["admin","user","guest"],example:"admin"}}},Order:{type:"object",properties:{orderId:{type:"string",example:"ORD-2025-8888"},buyer:{$ref:"#/components/schemas/User"},items:{type:"array",items:{type:"object",properties:{productId:{type:"integer",example:99},name:{type:"string",example:"高级机械键盘"},tags:{type:"array",items:{type:"string",example:"数码"}}}}}}}}},paths:{"/orders/{orderId}":{get:{operationId:"getOrderDetail",summary:"获取订单详情",description:`测试点：
 1. Path 参数替换 (buildCurlExample)
 2. Header 参数解析
 3. x-error-codes 解析
@@ -209,7 +209,7 @@ headers = {
 
 response = requests.get('https://api.example.com/v2/trade-orders/<orderId>', headers=headers)
 `}}]},{service:"github-contributions-api",version:"v4",raw:{openapi:"3.1.0",info:{title:"GitHub Contributions API",version:"v4",description:`通过抓取用户 GitHub 个人资料页面，返回 GitHub 贡献数据的 API 服务。
-⚠️ 注意：结果会缓存 1 小时！
+注意：结果会缓存 1 小时
 `,contact:{name:"GitHub Repository",url:"https://github.com/grubersjoe/github-contributions-api"}},servers:[{url:"https://api.f1a.me/github-contributions-api",description:"赤石科技镜像托管"},{url:"https://github-contributions-api.jogruber.de",description:"原版官方托管"}],tags:[{name:"contributions",description:"GitHub 贡献数据相关接口"}],paths:{"/":{get:{summary:"获取 API 欢迎信息",description:"返回 API 的基本信息和文档链接",operationId:"getWelcome",tags:["contributions"],responses:{200:{description:"成功返回欢迎信息",content:{"application/json":{schema:{type:"object",properties:{message:{type:"string",example:"Welcome to the GitHub Contributions API."},version:{type:"string",example:"v4"},docs:{type:"string",format:"uri",example:"https://github.com/grubersjoe/github-contributions-api"}}}}}}}}},"/v4":{get:{summary:"重定向到根路径",description:"重定向到 API 根路径",operationId:"redirectToRoot",tags:["contributions"],responses:{302:{description:"重定向到根路径"}}}},"/v4/{username}":{get:{summary:"获取用户的 GitHub 贡献数据",description:"根据 GitHub 用户名获取该用户的贡献历史数据。支持按年份筛选和嵌套格式输出。\n\n**缓存机制**：\n- 结果默认缓存 1 小时\n- 可通过 `cache-control: no-cache` 请求头强制刷新（请谨慎使用）\n- 响应头包含 `age` 和 `x-cache` 字段提供缓存状态信息\n",operationId:"getUserContributions",tags:["contributions"],parameters:[{name:"username",in:"path",required:!0,description:"GitHub 用户名",schema:{type:"string"},example:"grubersjoe"},{name:"y",in:"query",required:!1,description:`年份筛选参数，可以是：
 - 具体年份数字（如 2020）
 - \`all\`：所有年份（默认）
@@ -317,6 +317,163 @@ headers = {
 }
 
 response = requests.get('https://api.f1a.me/github-contributions-api/v4/<username>?y=<y>&format=<format>', headers=headers)
+`}}]},{service:"moe-counter",version:"v1",raw:{openapi:"3.1.0",info:{title:"Moe Counter API",version:"v1",description:`Moe Counter（萌萌计数器）API。
+提供萌系计数图片生成与计数记录服务。
+`},servers:[{url:"https://api.f1a.me/moe-counter",description:"赤石科技镜像托管"}],tags:[{name:"counter",description:"计数器（SVG）相关接口"},{name:"record",description:"计数器记录（JSON）相关接口"},{name:"health",description:"健康检查"}],paths:{"/":{get:{summary:"首页",description:"返回服务的首页（HTML），包含主题展示与参数说明。",operationId:"getHomePage",tags:["counter"],responses:{200:{description:"成功返回首页",content:{"text/html":{schema:{type:"string"}}}}}}},"/@{name}":{get:{summary:"获取计数器 SVG",description:`生成指定计数器的 SVG 图片。
+
+说明：
+- \`name=demo\` 会返回示例计数（特殊值）。
+- 当 \`theme=random\` 时会随机选择主题。
+`,operationId:"getCounterSvg",tags:["counter"],parameters:[{name:"name",in:"path",required:!0,description:"计数器名称（唯一标识）",schema:{type:"string",maxLength:32},example:"demo"},{name:"theme",in:"query",required:!1,description:"主题名称，`random` 表示随机",schema:{type:"string",default:"moebooru"},examples:{default:{value:"moebooru",summary:"默认主题"},random:{value:"random",summary:"随机主题"}}},{name:"padding",in:"query",required:!1,description:"最小位数（不足补 0），范围 0-16",schema:{type:"integer",minimum:0,maximum:16,default:7},example:7},{name:"offset",in:"query",required:!1,description:"数字间的像素偏移，范围 -500~500",schema:{type:"number",minimum:-500,maximum:500,default:0},example:0},{name:"align",in:"query",required:!1,description:"垂直对齐方式",schema:{type:"string",enum:["top","center","bottom"],default:"top"},example:"top"},{name:"scale",in:"query",required:!1,description:"缩放比例，范围 0.1~2",schema:{type:"number",minimum:.1,maximum:2,default:1},example:1},{name:"pixelated",in:"query",required:!1,description:"是否开启像素化渲染（0/1）",schema:{type:"string",enum:["0","1"],default:"1"},example:"1"},{name:"darkmode",in:"query",required:!1,description:"暗色模式（0/1/auto）",schema:{type:"string",enum:["0","1","auto"],default:"auto"},example:"auto"},{name:"num",in:"query",required:!1,description:"直接指定展示数字；`0` 表示禁用（默认）。\n大于 0 时，会以该数值渲染，而不会自增。\n",schema:{type:"integer",minimum:0,maximum:1e15,default:0},example:0},{name:"prefix",in:"query",required:!1,description:"前缀数字；`-1` 表示禁用",schema:{type:"integer",minimum:-1,maximum:999999,default:-1},example:-1}],responses:{200:{description:"成功返回 SVG 图片",content:{"image/svg+xml":{schema:{type:"string"},examples:{example:{summary:"SVG 文本内容（省略）",value:'<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg"/>'}}}}},400:{description:"参数校验失败",content:{"application/json":{schema:{$ref:"#/components/schemas/ErrorResponse"},example:{code:400,message:"The field `scale` is invalid. Number must be greater than or equal to 0.1"}}}}}}},"/get/@{name}":{get:{summary:"获取计数器 SVG（别名）",description:"与 `/@{name}` 等价的别名路径。",operationId:"getCounterSvgAlias",tags:["counter"],parameters:[{$ref:"#/components/parameters/CounterName"},{$ref:"#/components/parameters/Theme"},{$ref:"#/components/parameters/Padding"},{$ref:"#/components/parameters/Offset"},{$ref:"#/components/parameters/Align"},{$ref:"#/components/parameters/Scale"},{$ref:"#/components/parameters/Pixelated"},{$ref:"#/components/parameters/Darkmode"},{$ref:"#/components/parameters/Num"},{$ref:"#/components/parameters/Prefix"}],responses:{200:{description:"成功返回 SVG 图片",content:{"image/svg+xml":{schema:{type:"string"}}}},400:{description:"参数校验失败",content:{"application/json":{schema:{$ref:"#/components/schemas/ErrorResponse"}}}}}}},"/record/@{name}":{get:{summary:"获取计数器记录（JSON）",description:"返回计数器当前值（会自增并写入存储）。",operationId:"getCounterRecord",tags:["record"],parameters:[{$ref:"#/components/parameters/CounterName"}],responses:{200:{description:"成功返回计数器记录",content:{"application/json":{schema:{$ref:"#/components/schemas/CounterRecord"},examples:{normal:{value:{name:"demo",num:123}},demo:{value:{name:"demo",num:"0123456789"}}}}}}}}},"/heart-beat":{get:{summary:"健康检查",description:"返回 `alive` 字符串。",operationId:"getHeartBeat",tags:["health"],responses:{200:{description:"服务正常",content:{"text/plain":{schema:{type:"string"},example:"alive"}}}}}}},components:{parameters:{CounterName:{name:"name",in:"path",required:!0,description:"计数器名称（唯一标识）",schema:{type:"string",maxLength:32},example:"demo"},Theme:{name:"theme",in:"query",required:!1,description:"主题名称，`random` 表示随机",schema:{type:"string",default:"moebooru"}},Padding:{name:"padding",in:"query",required:!1,description:"最小位数（不足补 0），范围 0-16",schema:{type:"integer",minimum:0,maximum:16,default:7}},Offset:{name:"offset",in:"query",required:!1,description:"数字间的像素偏移，范围 -500~500",schema:{type:"number",minimum:-500,maximum:500,default:0}},Align:{name:"align",in:"query",required:!1,description:"垂直对齐方式",schema:{type:"string",enum:["top","center","bottom"],default:"top"}},Scale:{name:"scale",in:"query",required:!1,description:"缩放比例，范围 0.1~2",schema:{type:"number",minimum:.1,maximum:2,default:1}},Pixelated:{name:"pixelated",in:"query",required:!1,description:"是否开启像素化渲染（0/1）",schema:{type:"string",enum:["0","1"],default:"1"}},Darkmode:{name:"darkmode",in:"query",required:!1,description:"暗色模式（0/1/auto）",schema:{type:"string",enum:["0","1","auto"],default:"auto"}},Num:{name:"num",in:"query",required:!1,description:"直接指定展示数字；`0` 表示禁用（默认）",schema:{type:"integer",minimum:0,maximum:1e15,default:0}},Prefix:{name:"prefix",in:"query",required:!1,description:"前缀数字；`-1` 表示禁用",schema:{type:"integer",minimum:-1,maximum:999999,default:-1}}},schemas:{CounterRecord:{type:"object",required:["name","num"],properties:{name:{type:"string",description:"计数器名称",example:"demo"},num:{description:"计数器数值（`demo` 可能是字符串）",oneOf:[{type:"integer",example:123},{type:"string",example:"0123456789"}]}}},ErrorResponse:{type:"object",required:["code","message"],properties:{code:{type:"integer",example:400},message:{type:"string",example:"The field `name` is invalid. String must contain at most 32 character(s)"}}}}}},endpoints:[{service:"moe-counter",version:"v1",method:"get",path:"/",operationId:"getHomePage",summary:"首页",description:"返回服务的首页（HTML），包含主题展示与参数说明。",tags:["counter"],deprecated:!1,parameters:[],responses:[{status:"200",description:"成功返回首页"}],searchText:`getHomePage
+/
+首页
+返回服务的首页（HTML），包含主题展示与参数说明。
+counter`,curlExample:"curl -X GET 'https://api.f1a.me/moe-counter/' -H 'Accept: application/json'",codeExamples:{fetch:`import fetch from 'node-fetch';
+
+fetch('https://api.f1a.me/moe-counter/', {
+  headers: {
+    'Accept': 'application/json'
+  }
+});
+`,axios:`import axios from 'axios';
+
+const response = await axios.get('https://api.f1a.me/moe-counter/', {
+  headers: {
+    'Accept': 'application/json'
+  }
+});
+`,python:`import requests
+
+headers = {
+    'Accept': 'application/json',
+}
+
+response = requests.get('https://api.f1a.me/moe-counter/', headers=headers)
+`}},{service:"moe-counter",version:"v1",method:"get",path:"/@{name}",operationId:"getCounterSvg",summary:"获取计数器 SVG",description:`生成指定计数器的 SVG 图片。
+
+说明：
+- \`name=demo\` 会返回示例计数（特殊值）。
+- 当 \`theme=random\` 时会随机选择主题。
+`,tags:["counter"],deprecated:!1,parameters:[{name:"name",in:"path",required:!0,description:"计数器名称（唯一标识）",schema:{type:"string",maxLength:32}},{name:"theme",in:"query",required:!1,description:"主题名称，`random` 表示随机",schema:{type:"string",default:"moebooru"}},{name:"padding",in:"query",required:!1,description:"最小位数（不足补 0），范围 0-16",schema:{type:"integer",minimum:0,maximum:16,default:7}},{name:"offset",in:"query",required:!1,description:"数字间的像素偏移，范围 -500~500",schema:{type:"number",minimum:-500,maximum:500,default:0}},{name:"align",in:"query",required:!1,description:"垂直对齐方式",schema:{type:"string",enum:["top","center","bottom"],default:"top"}},{name:"scale",in:"query",required:!1,description:"缩放比例，范围 0.1~2",schema:{type:"number",minimum:.1,maximum:2,default:1}},{name:"pixelated",in:"query",required:!1,description:"是否开启像素化渲染（0/1）",schema:{type:"string",enum:["0","1"],default:"1"}},{name:"darkmode",in:"query",required:!1,description:"暗色模式（0/1/auto）",schema:{type:"string",enum:["0","1","auto"],default:"auto"}},{name:"num",in:"query",required:!1,description:"直接指定展示数字；`0` 表示禁用（默认）。\n大于 0 时，会以该数值渲染，而不会自增。\n",schema:{type:"integer",minimum:0,maximum:1e15,default:0}},{name:"prefix",in:"query",required:!1,description:"前缀数字；`-1` 表示禁用",schema:{type:"integer",minimum:-1,maximum:999999,default:-1}}],responses:[{status:"200",description:"成功返回 SVG 图片"},{status:"400",description:"参数校验失败",schema:{$ref:"#/components/schemas/ErrorResponse"},resolvedSchema:{type:"object",properties:{code:{type:"integer"},message:{type:"string"}},required:["code","message"]},exampleJson:`{
+  "code": 400,
+  "message": "The field \`name\` is invalid. String must contain at most 32 character(s)"
+}`}],searchText:`getCounterSvg
+/@{name}
+获取计数器 SVG
+生成指定计数器的 SVG 图片。
+
+说明：
+- \`name=demo\` 会返回示例计数（特殊值）。
+- 当 \`theme=random\` 时会随机选择主题。
+
+counter`,curlExample:"curl -X GET 'https://api.f1a.me/moe-counter/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>' -H 'Accept: application/json'",codeExamples:{fetch:`import fetch from 'node-fetch';
+
+fetch('https://api.f1a.me/moe-counter/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>', {
+  headers: {
+    'Accept': 'application/json'
+  }
+});
+`,axios:`import axios from 'axios';
+
+const response = await axios.get('https://api.f1a.me/moe-counter/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>', {
+  headers: {
+    'Accept': 'application/json'
+  }
+});
+`,python:`import requests
+
+headers = {
+    'Accept': 'application/json',
+}
+
+response = requests.get(
+    'https://api.f1a.me/moe-counter/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>',
+    headers=headers,
+)
+`}},{service:"moe-counter",version:"v1",method:"get",path:"/get/@{name}",operationId:"getCounterSvgAlias",summary:"获取计数器 SVG（别名）",description:"与 `/@{name}` 等价的别名路径。",tags:["counter"],deprecated:!1,parameters:[{name:"name",in:"path",required:!0,description:"计数器名称（唯一标识）",schema:{type:"string",maxLength:32}},{name:"theme",in:"query",required:!1,description:"主题名称，`random` 表示随机",schema:{type:"string",default:"moebooru"}},{name:"padding",in:"query",required:!1,description:"最小位数（不足补 0），范围 0-16",schema:{type:"integer",minimum:0,maximum:16,default:7}},{name:"offset",in:"query",required:!1,description:"数字间的像素偏移，范围 -500~500",schema:{type:"number",minimum:-500,maximum:500,default:0}},{name:"align",in:"query",required:!1,description:"垂直对齐方式",schema:{type:"string",enum:["top","center","bottom"],default:"top"}},{name:"scale",in:"query",required:!1,description:"缩放比例，范围 0.1~2",schema:{type:"number",minimum:.1,maximum:2,default:1}},{name:"pixelated",in:"query",required:!1,description:"是否开启像素化渲染（0/1）",schema:{type:"string",enum:["0","1"],default:"1"}},{name:"darkmode",in:"query",required:!1,description:"暗色模式（0/1/auto）",schema:{type:"string",enum:["0","1","auto"],default:"auto"}},{name:"num",in:"query",required:!1,description:"直接指定展示数字；`0` 表示禁用（默认）",schema:{type:"integer",minimum:0,maximum:1e15,default:0}},{name:"prefix",in:"query",required:!1,description:"前缀数字；`-1` 表示禁用",schema:{type:"integer",minimum:-1,maximum:999999,default:-1}}],responses:[{status:"200",description:"成功返回 SVG 图片"},{status:"400",description:"参数校验失败",schema:{$ref:"#/components/schemas/ErrorResponse"},resolvedSchema:{type:"object",properties:{code:{type:"integer"},message:{type:"string"}},required:["code","message"]},exampleJson:`{
+  "code": 400,
+  "message": "The field \`name\` is invalid. String must contain at most 32 character(s)"
+}`}],searchText:`getCounterSvgAlias
+/get/@{name}
+获取计数器 SVG（别名）
+与 \`/@{name}\` 等价的别名路径。
+counter`,curlExample:"curl -X GET 'https://api.f1a.me/moe-counter/get/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>' -H 'Accept: application/json'",codeExamples:{fetch:`import fetch from 'node-fetch';
+
+fetch('https://api.f1a.me/moe-counter/get/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>', {
+  headers: {
+    'Accept': 'application/json'
+  }
+});
+`,axios:`import axios from 'axios';
+
+const response = await axios.get('https://api.f1a.me/moe-counter/get/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>', {
+  headers: {
+    'Accept': 'application/json'
+  }
+});
+`,python:`import requests
+
+headers = {
+    'Accept': 'application/json',
+}
+
+response = requests.get(
+    'https://api.f1a.me/moe-counter/get/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>',
+    headers=headers,
+)
+`}},{service:"moe-counter",version:"v1",method:"get",path:"/record/@{name}",operationId:"getCounterRecord",summary:"获取计数器记录（JSON）",description:"返回计数器当前值（会自增并写入存储）。",tags:["record"],deprecated:!1,parameters:[{name:"name",in:"path",required:!0,description:"计数器名称（唯一标识）",schema:{type:"string",maxLength:32}}],responses:[{status:"200",description:"成功返回计数器记录",schema:{$ref:"#/components/schemas/CounterRecord"},resolvedSchema:{type:"object",properties:{name:{type:"string",description:"计数器名称"},num:{description:"计数器数值（`demo` 可能是字符串）"}},required:["name","num"]},exampleJson:`{
+  "name": "demo",
+  "num": null
+}`}],searchText:`getCounterRecord
+/record/@{name}
+获取计数器记录（JSON）
+返回计数器当前值（会自增并写入存储）。
+record`,curlExample:"curl -X GET 'https://api.f1a.me/moe-counter/record/@<name>' -H 'Accept: application/json'",codeExamples:{fetch:`import fetch from 'node-fetch';
+
+fetch('https://api.f1a.me/moe-counter/record/@<name>', {
+  headers: {
+    'Accept': 'application/json'
+  }
+});
+`,axios:`import axios from 'axios';
+
+const response = await axios.get('https://api.f1a.me/moe-counter/record/@<name>', {
+  headers: {
+    'Accept': 'application/json'
+  }
+});
+`,python:`import requests
+
+headers = {
+    'Accept': 'application/json',
+}
+
+response = requests.get('https://api.f1a.me/moe-counter/record/@<name>', headers=headers)
+`}},{service:"moe-counter",version:"v1",method:"get",path:"/heart-beat",operationId:"getHeartBeat",summary:"健康检查",description:"返回 `alive` 字符串。",tags:["health"],deprecated:!1,parameters:[],responses:[{status:"200",description:"服务正常"}],searchText:`getHeartBeat
+/heart-beat
+健康检查
+返回 \`alive\` 字符串。
+health`,curlExample:"curl -X GET 'https://api.f1a.me/moe-counter/heart-beat' -H 'Accept: application/json'",codeExamples:{fetch:`import fetch from 'node-fetch';
+
+fetch('https://api.f1a.me/moe-counter/heart-beat', {
+  headers: {
+    'Accept': 'application/json'
+  }
+});
+`,axios:`import axios from 'axios';
+
+const response = await axios.get('https://api.f1a.me/moe-counter/heart-beat', {
+  headers: {
+    'Accept': 'application/json'
+  }
+});
+`,python:`import requests
+
+headers = {
+    'Accept': 'application/json',
+}
+
+response = requests.get('https://api.f1a.me/moe-counter/heart-beat', headers=headers)
 `}}]}],allEndpoints:[{service:"example",version:"v1",method:"get",path:"/orders/{orderId}",operationId:"getOrderDetail",summary:"获取订单详情",description:`测试点：
 1. Path 参数替换 (buildCurlExample)
 2. Header 参数解析
@@ -619,4 +776,154 @@ headers = {
 }
 
 response = requests.get('https://api.f1a.me/github-contributions-api/v4/<username>?y=<y>&format=<format>', headers=headers)
-`}}]};function m(){const{bundles:o,allEndpoints:e}=c,a=n.useMemo(()=>t=>e.filter(r=>r.service===t),[e]),i=n.useMemo(()=>(t,r)=>e.filter(s=>s.service===t&&s.version===r),[e]),p=n.useMemo(()=>t=>e.find(r=>r.operationId===t),[e]);return{bundles:o,allEndpoints:e,filterByService:a,filterByVersion:i,findByOperationId:p}}export{m as u};
+`}},{service:"moe-counter",version:"v1",method:"get",path:"/",operationId:"getHomePage",summary:"首页",description:"返回服务的首页（HTML），包含主题展示与参数说明。",tags:["counter"],deprecated:!1,parameters:[],responses:[{status:"200",description:"成功返回首页"}],searchText:`getHomePage
+/
+首页
+返回服务的首页（HTML），包含主题展示与参数说明。
+counter`,curlExample:"curl -X GET 'https://api.f1a.me/moe-counter/' -H 'Accept: application/json'",codeExamples:{fetch:`import fetch from 'node-fetch';
+
+fetch('https://api.f1a.me/moe-counter/', {
+  headers: {
+    'Accept': 'application/json'
+  }
+});
+`,axios:`import axios from 'axios';
+
+const response = await axios.get('https://api.f1a.me/moe-counter/', {
+  headers: {
+    'Accept': 'application/json'
+  }
+});
+`,python:`import requests
+
+headers = {
+    'Accept': 'application/json',
+}
+
+response = requests.get('https://api.f1a.me/moe-counter/', headers=headers)
+`}},{service:"moe-counter",version:"v1",method:"get",path:"/@{name}",operationId:"getCounterSvg",summary:"获取计数器 SVG",description:`生成指定计数器的 SVG 图片。
+
+说明：
+- \`name=demo\` 会返回示例计数（特殊值）。
+- 当 \`theme=random\` 时会随机选择主题。
+`,tags:["counter"],deprecated:!1,parameters:[{name:"name",in:"path",required:!0,description:"计数器名称（唯一标识）",schema:{type:"string",maxLength:32}},{name:"theme",in:"query",required:!1,description:"主题名称，`random` 表示随机",schema:{type:"string",default:"moebooru"}},{name:"padding",in:"query",required:!1,description:"最小位数（不足补 0），范围 0-16",schema:{type:"integer",minimum:0,maximum:16,default:7}},{name:"offset",in:"query",required:!1,description:"数字间的像素偏移，范围 -500~500",schema:{type:"number",minimum:-500,maximum:500,default:0}},{name:"align",in:"query",required:!1,description:"垂直对齐方式",schema:{type:"string",enum:["top","center","bottom"],default:"top"}},{name:"scale",in:"query",required:!1,description:"缩放比例，范围 0.1~2",schema:{type:"number",minimum:.1,maximum:2,default:1}},{name:"pixelated",in:"query",required:!1,description:"是否开启像素化渲染（0/1）",schema:{type:"string",enum:["0","1"],default:"1"}},{name:"darkmode",in:"query",required:!1,description:"暗色模式（0/1/auto）",schema:{type:"string",enum:["0","1","auto"],default:"auto"}},{name:"num",in:"query",required:!1,description:"直接指定展示数字；`0` 表示禁用（默认）。\n大于 0 时，会以该数值渲染，而不会自增。\n",schema:{type:"integer",minimum:0,maximum:1e15,default:0}},{name:"prefix",in:"query",required:!1,description:"前缀数字；`-1` 表示禁用",schema:{type:"integer",minimum:-1,maximum:999999,default:-1}}],responses:[{status:"200",description:"成功返回 SVG 图片"},{status:"400",description:"参数校验失败",schema:{$ref:"#/components/schemas/ErrorResponse"},resolvedSchema:{type:"object",properties:{code:{type:"integer"},message:{type:"string"}},required:["code","message"]},exampleJson:`{
+  "code": 400,
+  "message": "The field \`name\` is invalid. String must contain at most 32 character(s)"
+}`}],searchText:`getCounterSvg
+/@{name}
+获取计数器 SVG
+生成指定计数器的 SVG 图片。
+
+说明：
+- \`name=demo\` 会返回示例计数（特殊值）。
+- 当 \`theme=random\` 时会随机选择主题。
+
+counter`,curlExample:"curl -X GET 'https://api.f1a.me/moe-counter/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>' -H 'Accept: application/json'",codeExamples:{fetch:`import fetch from 'node-fetch';
+
+fetch('https://api.f1a.me/moe-counter/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>', {
+  headers: {
+    'Accept': 'application/json'
+  }
+});
+`,axios:`import axios from 'axios';
+
+const response = await axios.get('https://api.f1a.me/moe-counter/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>', {
+  headers: {
+    'Accept': 'application/json'
+  }
+});
+`,python:`import requests
+
+headers = {
+    'Accept': 'application/json',
+}
+
+response = requests.get(
+    'https://api.f1a.me/moe-counter/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>',
+    headers=headers,
+)
+`}},{service:"moe-counter",version:"v1",method:"get",path:"/get/@{name}",operationId:"getCounterSvgAlias",summary:"获取计数器 SVG（别名）",description:"与 `/@{name}` 等价的别名路径。",tags:["counter"],deprecated:!1,parameters:[{name:"name",in:"path",required:!0,description:"计数器名称（唯一标识）",schema:{type:"string",maxLength:32}},{name:"theme",in:"query",required:!1,description:"主题名称，`random` 表示随机",schema:{type:"string",default:"moebooru"}},{name:"padding",in:"query",required:!1,description:"最小位数（不足补 0），范围 0-16",schema:{type:"integer",minimum:0,maximum:16,default:7}},{name:"offset",in:"query",required:!1,description:"数字间的像素偏移，范围 -500~500",schema:{type:"number",minimum:-500,maximum:500,default:0}},{name:"align",in:"query",required:!1,description:"垂直对齐方式",schema:{type:"string",enum:["top","center","bottom"],default:"top"}},{name:"scale",in:"query",required:!1,description:"缩放比例，范围 0.1~2",schema:{type:"number",minimum:.1,maximum:2,default:1}},{name:"pixelated",in:"query",required:!1,description:"是否开启像素化渲染（0/1）",schema:{type:"string",enum:["0","1"],default:"1"}},{name:"darkmode",in:"query",required:!1,description:"暗色模式（0/1/auto）",schema:{type:"string",enum:["0","1","auto"],default:"auto"}},{name:"num",in:"query",required:!1,description:"直接指定展示数字；`0` 表示禁用（默认）",schema:{type:"integer",minimum:0,maximum:1e15,default:0}},{name:"prefix",in:"query",required:!1,description:"前缀数字；`-1` 表示禁用",schema:{type:"integer",minimum:-1,maximum:999999,default:-1}}],responses:[{status:"200",description:"成功返回 SVG 图片"},{status:"400",description:"参数校验失败",schema:{$ref:"#/components/schemas/ErrorResponse"},resolvedSchema:{type:"object",properties:{code:{type:"integer"},message:{type:"string"}},required:["code","message"]},exampleJson:`{
+  "code": 400,
+  "message": "The field \`name\` is invalid. String must contain at most 32 character(s)"
+}`}],searchText:`getCounterSvgAlias
+/get/@{name}
+获取计数器 SVG（别名）
+与 \`/@{name}\` 等价的别名路径。
+counter`,curlExample:"curl -X GET 'https://api.f1a.me/moe-counter/get/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>' -H 'Accept: application/json'",codeExamples:{fetch:`import fetch from 'node-fetch';
+
+fetch('https://api.f1a.me/moe-counter/get/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>', {
+  headers: {
+    'Accept': 'application/json'
+  }
+});
+`,axios:`import axios from 'axios';
+
+const response = await axios.get('https://api.f1a.me/moe-counter/get/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>', {
+  headers: {
+    'Accept': 'application/json'
+  }
+});
+`,python:`import requests
+
+headers = {
+    'Accept': 'application/json',
+}
+
+response = requests.get(
+    'https://api.f1a.me/moe-counter/get/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>',
+    headers=headers,
+)
+`}},{service:"moe-counter",version:"v1",method:"get",path:"/record/@{name}",operationId:"getCounterRecord",summary:"获取计数器记录（JSON）",description:"返回计数器当前值（会自增并写入存储）。",tags:["record"],deprecated:!1,parameters:[{name:"name",in:"path",required:!0,description:"计数器名称（唯一标识）",schema:{type:"string",maxLength:32}}],responses:[{status:"200",description:"成功返回计数器记录",schema:{$ref:"#/components/schemas/CounterRecord"},resolvedSchema:{type:"object",properties:{name:{type:"string",description:"计数器名称"},num:{description:"计数器数值（`demo` 可能是字符串）"}},required:["name","num"]},exampleJson:`{
+  "name": "demo",
+  "num": null
+}`}],searchText:`getCounterRecord
+/record/@{name}
+获取计数器记录（JSON）
+返回计数器当前值（会自增并写入存储）。
+record`,curlExample:"curl -X GET 'https://api.f1a.me/moe-counter/record/@<name>' -H 'Accept: application/json'",codeExamples:{fetch:`import fetch from 'node-fetch';
+
+fetch('https://api.f1a.me/moe-counter/record/@<name>', {
+  headers: {
+    'Accept': 'application/json'
+  }
+});
+`,axios:`import axios from 'axios';
+
+const response = await axios.get('https://api.f1a.me/moe-counter/record/@<name>', {
+  headers: {
+    'Accept': 'application/json'
+  }
+});
+`,python:`import requests
+
+headers = {
+    'Accept': 'application/json',
+}
+
+response = requests.get('https://api.f1a.me/moe-counter/record/@<name>', headers=headers)
+`}},{service:"moe-counter",version:"v1",method:"get",path:"/heart-beat",operationId:"getHeartBeat",summary:"健康检查",description:"返回 `alive` 字符串。",tags:["health"],deprecated:!1,parameters:[],responses:[{status:"200",description:"服务正常"}],searchText:`getHeartBeat
+/heart-beat
+健康检查
+返回 \`alive\` 字符串。
+health`,curlExample:"curl -X GET 'https://api.f1a.me/moe-counter/heart-beat' -H 'Accept: application/json'",codeExamples:{fetch:`import fetch from 'node-fetch';
+
+fetch('https://api.f1a.me/moe-counter/heart-beat', {
+  headers: {
+    'Accept': 'application/json'
+  }
+});
+`,axios:`import axios from 'axios';
+
+const response = await axios.get('https://api.f1a.me/moe-counter/heart-beat', {
+  headers: {
+    'Accept': 'application/json'
+  }
+});
+`,python:`import requests
+
+headers = {
+    'Accept': 'application/json',
+}
+
+response = requests.get('https://api.f1a.me/moe-counter/heart-beat', headers=headers)
+`}}]};function d(){const{bundles:s,allEndpoints:e}=m,o=r.useMemo(()=>t=>e.filter(n=>n.service===t),[e]),i=r.useMemo(()=>(t,n)=>e.filter(a=>a.service===t&&a.version===n),[e]),p=r.useMemo(()=>t=>e.find(n=>n.operationId===t),[e]);return{bundles:s,allEndpoints:e,filterByService:o,filterByVersion:i,findByOperationId:p}}export{d as u};

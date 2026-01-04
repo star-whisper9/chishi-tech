@@ -1,0 +1,389 @@
+openapi: 3.1.0
+info:
+  title: Moe Counter API
+  version: v1
+  description: |
+    Moe Counter（萌萌计数器）API。
+    提供萌系计数图片生成与计数记录服务。
+
+servers:
+  - url: https://api.f1a.me/moe-counter
+    description: 赤石科技镜像托管
+
+tags:
+  - name: counter
+    description: 计数器（SVG）相关接口
+  - name: record
+    description: 计数器记录（JSON）相关接口
+  - name: health
+    description: 健康检查
+
+paths:
+  /:
+    get:
+      summary: 首页
+      description: 返回服务的首页（HTML），包含主题展示与参数说明。
+      operationId: getHomePage
+      tags:
+        - counter
+      responses:
+        "200":
+          description: 成功返回首页
+          content:
+            text/html:
+              schema:
+                type: string
+
+  /@{name}:
+    get:
+      summary: 获取计数器 SVG
+      description: |
+        生成指定计数器的 SVG 图片。
+
+        说明：
+        - `name=demo` 会返回示例计数（特殊值）。
+        - 当 `theme=random` 时会随机选择主题。
+      operationId: getCounterSvg
+      tags:
+        - counter
+      parameters:
+        - name: name
+          in: path
+          required: true
+          description: 计数器名称（唯一标识）
+          schema:
+            type: string
+            maxLength: 32
+          example: demo
+
+        - name: theme
+          in: query
+          required: false
+          description: 主题名称，`random` 表示随机
+          schema:
+            type: string
+            default: moebooru
+          examples:
+            default:
+              value: moebooru
+              summary: 默认主题
+            random:
+              value: random
+              summary: 随机主题
+
+        - name: padding
+          in: query
+          required: false
+          description: 最小位数（不足补 0），范围 0-16
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 16
+            default: 7
+          example: 7
+
+        - name: offset
+          in: query
+          required: false
+          description: 数字间的像素偏移，范围 -500~500
+          schema:
+            type: number
+            minimum: -500
+            maximum: 500
+            default: 0
+          example: 0
+
+        - name: align
+          in: query
+          required: false
+          description: 垂直对齐方式
+          schema:
+            type: string
+            enum: [top, center, bottom]
+            default: top
+          example: top
+
+        - name: scale
+          in: query
+          required: false
+          description: 缩放比例，范围 0.1~2
+          schema:
+            type: number
+            minimum: 0.1
+            maximum: 2
+            default: 1
+          example: 1
+
+        - name: pixelated
+          in: query
+          required: false
+          description: 是否开启像素化渲染（0/1）
+          schema:
+            type: string
+            enum: ["0", "1"]
+            default: "1"
+          example: "1"
+
+        - name: darkmode
+          in: query
+          required: false
+          description: 暗色模式（0/1/auto）
+          schema:
+            type: string
+            enum: ["0", "1", auto]
+            default: auto
+          example: auto
+
+        - name: num
+          in: query
+          required: false
+          description: |
+            直接指定展示数字；`0` 表示禁用（默认）。
+            大于 0 时，会以该数值渲染，而不会自增。
+          schema:
+            type: integer
+            minimum: 0
+            maximum: 1000000000000000
+            default: 0
+          example: 0
+
+        - name: prefix
+          in: query
+          required: false
+          description: 前缀数字；`-1` 表示禁用
+          schema:
+            type: integer
+            minimum: -1
+            maximum: 999999
+            default: -1
+          example: -1
+
+      responses:
+        "200":
+          description: 成功返回 SVG 图片
+          content:
+            image/svg+xml:
+              schema:
+                type: string
+              examples:
+                example:
+                  summary: SVG 文本内容（省略）
+                  value: '<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg"/>'
+
+        "400":
+          description: 参数校验失败
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+              example:
+                code: 400
+                message: "The field `scale` is invalid. Number must be greater than or equal to 0.1"
+
+  /get/@{name}:
+    get:
+      summary: 获取计数器 SVG（别名）
+      description: 与 `/@{name}` 等价的别名路径。
+      operationId: getCounterSvgAlias
+      tags:
+        - counter
+      parameters:
+        - $ref: "#/components/parameters/CounterName"
+        - $ref: "#/components/parameters/Theme"
+        - $ref: "#/components/parameters/Padding"
+        - $ref: "#/components/parameters/Offset"
+        - $ref: "#/components/parameters/Align"
+        - $ref: "#/components/parameters/Scale"
+        - $ref: "#/components/parameters/Pixelated"
+        - $ref: "#/components/parameters/Darkmode"
+        - $ref: "#/components/parameters/Num"
+        - $ref: "#/components/parameters/Prefix"
+      responses:
+        "200":
+          description: 成功返回 SVG 图片
+          content:
+            image/svg+xml:
+              schema:
+                type: string
+        "400":
+          description: 参数校验失败
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ErrorResponse"
+
+  /record/@{name}:
+    get:
+      summary: 获取计数器记录（JSON）
+      description: 返回计数器当前值（会自增并写入存储）。
+      operationId: getCounterRecord
+      tags:
+        - record
+      parameters:
+        - $ref: "#/components/parameters/CounterName"
+      responses:
+        "200":
+          description: 成功返回计数器记录
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CounterRecord"
+              examples:
+                normal:
+                  value:
+                    name: demo
+                    num: 123
+                demo:
+                  value:
+                    name: demo
+                    num: "0123456789"
+
+  /heart-beat:
+    get:
+      summary: 健康检查
+      description: 返回 `alive` 字符串。
+      operationId: getHeartBeat
+      tags:
+        - health
+      responses:
+        "200":
+          description: 服务正常
+          content:
+            text/plain:
+              schema:
+                type: string
+              example: alive
+
+components:
+  parameters:
+    CounterName:
+      name: name
+      in: path
+      required: true
+      description: 计数器名称（唯一标识）
+      schema:
+        type: string
+        maxLength: 32
+      example: demo
+
+    Theme:
+      name: theme
+      in: query
+      required: false
+      description: 主题名称，`random` 表示随机
+      schema:
+        type: string
+        default: moebooru
+
+    Padding:
+      name: padding
+      in: query
+      required: false
+      description: 最小位数（不足补 0），范围 0-16
+      schema:
+        type: integer
+        minimum: 0
+        maximum: 16
+        default: 7
+
+    Offset:
+      name: offset
+      in: query
+      required: false
+      description: 数字间的像素偏移，范围 -500~500
+      schema:
+        type: number
+        minimum: -500
+        maximum: 500
+        default: 0
+
+    Align:
+      name: align
+      in: query
+      required: false
+      description: 垂直对齐方式
+      schema:
+        type: string
+        enum: [top, center, bottom]
+        default: top
+
+    Scale:
+      name: scale
+      in: query
+      required: false
+      description: 缩放比例，范围 0.1~2
+      schema:
+        type: number
+        minimum: 0.1
+        maximum: 2
+        default: 1
+
+    Pixelated:
+      name: pixelated
+      in: query
+      required: false
+      description: 是否开启像素化渲染（0/1）
+      schema:
+        type: string
+        enum: ["0", "1"]
+        default: "1"
+
+    Darkmode:
+      name: darkmode
+      in: query
+      required: false
+      description: 暗色模式（0/1/auto）
+      schema:
+        type: string
+        enum: ["0", "1", auto]
+        default: auto
+
+    Num:
+      name: num
+      in: query
+      required: false
+      description: 直接指定展示数字；`0` 表示禁用（默认）
+      schema:
+        type: integer
+        minimum: 0
+        maximum: 1000000000000000
+        default: 0
+
+    Prefix:
+      name: prefix
+      in: query
+      required: false
+      description: 前缀数字；`-1` 表示禁用
+      schema:
+        type: integer
+        minimum: -1
+        maximum: 999999
+        default: -1
+
+  schemas:
+    CounterRecord:
+      type: object
+      required: [name, num]
+      properties:
+        name:
+          type: string
+          description: 计数器名称
+          example: demo
+        num:
+          description: 计数器数值（`demo` 可能是字符串）
+          oneOf:
+            - type: integer
+              example: 123
+            - type: string
+              example: "0123456789"
+
+    ErrorResponse:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: integer
+          example: 400
+        message:
+          type: string
+          example: "The field `name` is invalid. String must contain at most 32 character(s)"

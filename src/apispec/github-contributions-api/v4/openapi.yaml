@@ -4,7 +4,7 @@ info:
   version: v4
   description: |
     通过抓取用户 GitHub 个人资料页面，返回 GitHub 贡献数据的 API 服务。
-    ⚠️ 注意：结果会缓存 1 小时！
+    注意：结果会缓存 1 小时
   contact:
     name: GitHub Repository
     url: https://github.com/grubersjoe/github-contributions-api

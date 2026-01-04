@@ -47,6 +47,24 @@ function resolveRef(
   );
 }
 
+function resolveParameterRef(
+  ref: string,
+  doc: OpenAPIV3.Document,
+  depth = 0
+): OpenAPIV3.ParameterObject | null {
+  if (depth > 10) return null;
+  // 仅支持本地引用 #/components/parameters/XXX
+  const match = ref.match(/^#\/components\/parameters\/(\w+)$/);
+  if (!match) return null;
+  const paramName = match[1];
+  const raw = doc.components?.parameters?.[paramName];
+  if (!raw) return null;
+  if (typeof raw === "object" && raw && "$ref" in raw) {
+    return resolveParameterRef(String(raw.$ref), doc, depth + 1);
+  }
+  return raw as OpenAPIV3.ParameterObject;
+}
+
 function isArraySchema(
   schema: OpenAPIV3.SchemaObject
 ): schema is OpenAPIV3.ArraySchemaObject {
@@ -197,36 +215,50 @@ function extractEndpoints(
       if (!op) continue;
       const operationId =
         op.operationId || `${key}_${rawPath.replace(/\W+/g, "_")}`;
+
+      const normalizeParameter = (
+        p: OpenAPIV3.ParameterObject
+      ): ApiParameter => ({
+        name: p.name,
+        in: p.in as "path" | "query" | "header",
+        required: !!p.required,
+        description: p.description,
+        schema: p.schema,
+      });
+
       const parameters: ApiParameter[] = (op.parameters || [])
         .filter(Boolean)
         .map((p) => {
           if ("$ref" in p) {
+            const resolved = resolveParameterRef(String(p.$ref), doc);
+            if (resolved) return normalizeParameter(resolved);
+            // fallback: 保留原行为，避免阻断生成
             return {
-              name: p.$ref,
+              name: String(p.$ref),
               in: "query",
               required: false,
-            }; // 简化处理 $ref 参数
+            };
           }
-          return {
-            name: p.name,
-            in: p.in as "path" | "query" | "header",
-            required: !!p.required,
-            description: p.description,
-            schema: p.schema,
-          };
+          return normalizeParameter(p);
         });
       // 合并 pathItem 级别 parameters （OpenAPI 允许）
       if (Array.isArray(pathItem.parameters)) {
         for (const p of pathItem.parameters) {
-          if ("$ref" in p) continue; // 简化略过
-          if (!parameters.find((pp) => pp.name === p.name && pp.in === p.in)) {
-            parameters.push({
-              name: p.name,
-              in: p.in as "path" | "query" | "header",
-              required: !!p.required,
-              description: p.description,
-              schema: p.schema,
-            });
+          const normalized = (() => {
+            if ("$ref" in p) {
+              const resolved = resolveParameterRef(String(p.$ref), doc);
+              return resolved ? normalizeParameter(resolved) : null;
+            }
+            return normalizeParameter(p);
+          })();
+
+          if (!normalized) continue;
+          if (
+            !parameters.find(
+              (pp) => pp.name === normalized.name && pp.in === normalized.in
+            )
+          ) {
+            parameters.push(normalized);
           }
         }
       }

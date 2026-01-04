@@ -652,7 +652,7 @@ export const apiSpecs: ApiSpecsGenerated = {
         "info": {
           "title": "GitHub Contributions API",
           "version": "v4",
-          "description": "通过抓取用户 GitHub 个人资料页面，返回 GitHub 贡献数据的 API 服务。\n⚠️ 注意：结果会缓存 1 小时！\n",
+          "description": "通过抓取用户 GitHub 个人资料页面，返回 GitHub 贡献数据的 API 服务。\n注意：结果会缓存 1 小时\n",
           "contact": {
             "name": "GitHub Repository",
             "url": "https://github.com/grubersjoe/github-contributions-api"
@@ -1375,6 +1375,1016 @@ export const apiSpecs: ApiSpecsGenerated = {
           }
         }
       ]
+    },
+    {
+      "service": "moe-counter",
+      "version": "v1",
+      "raw": {
+        "openapi": "3.1.0",
+        "info": {
+          "title": "Moe Counter API",
+          "version": "v1",
+          "description": "Moe Counter（萌萌计数器）API。\n提供萌系计数图片生成与计数记录服务。\n"
+        },
+        "servers": [
+          {
+            "url": "https://api.f1a.me/moe-counter",
+            "description": "赤石科技镜像托管"
+          }
+        ],
+        "tags": [
+          {
+            "name": "counter",
+            "description": "计数器（SVG）相关接口"
+          },
+          {
+            "name": "record",
+            "description": "计数器记录（JSON）相关接口"
+          },
+          {
+            "name": "health",
+            "description": "健康检查"
+          }
+        ],
+        "paths": {
+          "/": {
+            "get": {
+              "summary": "首页",
+              "description": "返回服务的首页（HTML），包含主题展示与参数说明。",
+              "operationId": "getHomePage",
+              "tags": [
+                "counter"
+              ],
+              "responses": {
+                "200": {
+                  "description": "成功返回首页",
+                  "content": {
+                    "text/html": {
+                      "schema": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/@{name}": {
+            "get": {
+              "summary": "获取计数器 SVG",
+              "description": "生成指定计数器的 SVG 图片。\n\n说明：\n- `name=demo` 会返回示例计数（特殊值）。\n- 当 `theme=random` 时会随机选择主题。\n",
+              "operationId": "getCounterSvg",
+              "tags": [
+                "counter"
+              ],
+              "parameters": [
+                {
+                  "name": "name",
+                  "in": "path",
+                  "required": true,
+                  "description": "计数器名称（唯一标识）",
+                  "schema": {
+                    "type": "string",
+                    "maxLength": 32
+                  },
+                  "example": "demo"
+                },
+                {
+                  "name": "theme",
+                  "in": "query",
+                  "required": false,
+                  "description": "主题名称，`random` 表示随机",
+                  "schema": {
+                    "type": "string",
+                    "default": "moebooru"
+                  },
+                  "examples": {
+                    "default": {
+                      "value": "moebooru",
+                      "summary": "默认主题"
+                    },
+                    "random": {
+                      "value": "random",
+                      "summary": "随机主题"
+                    }
+                  }
+                },
+                {
+                  "name": "padding",
+                  "in": "query",
+                  "required": false,
+                  "description": "最小位数（不足补 0），范围 0-16",
+                  "schema": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 16,
+                    "default": 7
+                  },
+                  "example": 7
+                },
+                {
+                  "name": "offset",
+                  "in": "query",
+                  "required": false,
+                  "description": "数字间的像素偏移，范围 -500~500",
+                  "schema": {
+                    "type": "number",
+                    "minimum": -500,
+                    "maximum": 500,
+                    "default": 0
+                  },
+                  "example": 0
+                },
+                {
+                  "name": "align",
+                  "in": "query",
+                  "required": false,
+                  "description": "垂直对齐方式",
+                  "schema": {
+                    "type": "string",
+                    "enum": [
+                      "top",
+                      "center",
+                      "bottom"
+                    ],
+                    "default": "top"
+                  },
+                  "example": "top"
+                },
+                {
+                  "name": "scale",
+                  "in": "query",
+                  "required": false,
+                  "description": "缩放比例，范围 0.1~2",
+                  "schema": {
+                    "type": "number",
+                    "minimum": 0.1,
+                    "maximum": 2,
+                    "default": 1
+                  },
+                  "example": 1
+                },
+                {
+                  "name": "pixelated",
+                  "in": "query",
+                  "required": false,
+                  "description": "是否开启像素化渲染（0/1）",
+                  "schema": {
+                    "type": "string",
+                    "enum": [
+                      "0",
+                      "1"
+                    ],
+                    "default": "1"
+                  },
+                  "example": "1"
+                },
+                {
+                  "name": "darkmode",
+                  "in": "query",
+                  "required": false,
+                  "description": "暗色模式（0/1/auto）",
+                  "schema": {
+                    "type": "string",
+                    "enum": [
+                      "0",
+                      "1",
+                      "auto"
+                    ],
+                    "default": "auto"
+                  },
+                  "example": "auto"
+                },
+                {
+                  "name": "num",
+                  "in": "query",
+                  "required": false,
+                  "description": "直接指定展示数字；`0` 表示禁用（默认）。\n大于 0 时，会以该数值渲染，而不会自增。\n",
+                  "schema": {
+                    "type": "integer",
+                    "minimum": 0,
+                    "maximum": 1000000000000000,
+                    "default": 0
+                  },
+                  "example": 0
+                },
+                {
+                  "name": "prefix",
+                  "in": "query",
+                  "required": false,
+                  "description": "前缀数字；`-1` 表示禁用",
+                  "schema": {
+                    "type": "integer",
+                    "minimum": -1,
+                    "maximum": 999999,
+                    "default": -1
+                  },
+                  "example": -1
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "成功返回 SVG 图片",
+                  "content": {
+                    "image/svg+xml": {
+                      "schema": {
+                        "type": "string"
+                      },
+                      "examples": {
+                        "example": {
+                          "summary": "SVG 文本内容（省略）",
+                          "value": "<?xml version=\"1.0\" encoding=\"UTF-8\"?><svg xmlns=\"http://www.w3.org/2000/svg\"/>"
+                        }
+                      }
+                    }
+                  }
+                },
+                "400": {
+                  "description": "参数校验失败",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/ErrorResponse"
+                      },
+                      "example": {
+                        "code": 400,
+                        "message": "The field `scale` is invalid. Number must be greater than or equal to 0.1"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/get/@{name}": {
+            "get": {
+              "summary": "获取计数器 SVG（别名）",
+              "description": "与 `/@{name}` 等价的别名路径。",
+              "operationId": "getCounterSvgAlias",
+              "tags": [
+                "counter"
+              ],
+              "parameters": [
+                {
+                  "$ref": "#/components/parameters/CounterName"
+                },
+                {
+                  "$ref": "#/components/parameters/Theme"
+                },
+                {
+                  "$ref": "#/components/parameters/Padding"
+                },
+                {
+                  "$ref": "#/components/parameters/Offset"
+                },
+                {
+                  "$ref": "#/components/parameters/Align"
+                },
+                {
+                  "$ref": "#/components/parameters/Scale"
+                },
+                {
+                  "$ref": "#/components/parameters/Pixelated"
+                },
+                {
+                  "$ref": "#/components/parameters/Darkmode"
+                },
+                {
+                  "$ref": "#/components/parameters/Num"
+                },
+                {
+                  "$ref": "#/components/parameters/Prefix"
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "成功返回 SVG 图片",
+                  "content": {
+                    "image/svg+xml": {
+                      "schema": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "400": {
+                  "description": "参数校验失败",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/ErrorResponse"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/record/@{name}": {
+            "get": {
+              "summary": "获取计数器记录（JSON）",
+              "description": "返回计数器当前值（会自增并写入存储）。",
+              "operationId": "getCounterRecord",
+              "tags": [
+                "record"
+              ],
+              "parameters": [
+                {
+                  "$ref": "#/components/parameters/CounterName"
+                }
+              ],
+              "responses": {
+                "200": {
+                  "description": "成功返回计数器记录",
+                  "content": {
+                    "application/json": {
+                      "schema": {
+                        "$ref": "#/components/schemas/CounterRecord"
+                      },
+                      "examples": {
+                        "normal": {
+                          "value": {
+                            "name": "demo",
+                            "num": 123
+                          }
+                        },
+                        "demo": {
+                          "value": {
+                            "name": "demo",
+                            "num": "0123456789"
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "/heart-beat": {
+            "get": {
+              "summary": "健康检查",
+              "description": "返回 `alive` 字符串。",
+              "operationId": "getHeartBeat",
+              "tags": [
+                "health"
+              ],
+              "responses": {
+                "200": {
+                  "description": "服务正常",
+                  "content": {
+                    "text/plain": {
+                      "schema": {
+                        "type": "string"
+                      },
+                      "example": "alive"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "components": {
+          "parameters": {
+            "CounterName": {
+              "name": "name",
+              "in": "path",
+              "required": true,
+              "description": "计数器名称（唯一标识）",
+              "schema": {
+                "type": "string",
+                "maxLength": 32
+              },
+              "example": "demo"
+            },
+            "Theme": {
+              "name": "theme",
+              "in": "query",
+              "required": false,
+              "description": "主题名称，`random` 表示随机",
+              "schema": {
+                "type": "string",
+                "default": "moebooru"
+              }
+            },
+            "Padding": {
+              "name": "padding",
+              "in": "query",
+              "required": false,
+              "description": "最小位数（不足补 0），范围 0-16",
+              "schema": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 16,
+                "default": 7
+              }
+            },
+            "Offset": {
+              "name": "offset",
+              "in": "query",
+              "required": false,
+              "description": "数字间的像素偏移，范围 -500~500",
+              "schema": {
+                "type": "number",
+                "minimum": -500,
+                "maximum": 500,
+                "default": 0
+              }
+            },
+            "Align": {
+              "name": "align",
+              "in": "query",
+              "required": false,
+              "description": "垂直对齐方式",
+              "schema": {
+                "type": "string",
+                "enum": [
+                  "top",
+                  "center",
+                  "bottom"
+                ],
+                "default": "top"
+              }
+            },
+            "Scale": {
+              "name": "scale",
+              "in": "query",
+              "required": false,
+              "description": "缩放比例，范围 0.1~2",
+              "schema": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2,
+                "default": 1
+              }
+            },
+            "Pixelated": {
+              "name": "pixelated",
+              "in": "query",
+              "required": false,
+              "description": "是否开启像素化渲染（0/1）",
+              "schema": {
+                "type": "string",
+                "enum": [
+                  "0",
+                  "1"
+                ],
+                "default": "1"
+              }
+            },
+            "Darkmode": {
+              "name": "darkmode",
+              "in": "query",
+              "required": false,
+              "description": "暗色模式（0/1/auto）",
+              "schema": {
+                "type": "string",
+                "enum": [
+                  "0",
+                  "1",
+                  "auto"
+                ],
+                "default": "auto"
+              }
+            },
+            "Num": {
+              "name": "num",
+              "in": "query",
+              "required": false,
+              "description": "直接指定展示数字；`0` 表示禁用（默认）",
+              "schema": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000000000000000,
+                "default": 0
+              }
+            },
+            "Prefix": {
+              "name": "prefix",
+              "in": "query",
+              "required": false,
+              "description": "前缀数字；`-1` 表示禁用",
+              "schema": {
+                "type": "integer",
+                "minimum": -1,
+                "maximum": 999999,
+                "default": -1
+              }
+            }
+          },
+          "schemas": {
+            "CounterRecord": {
+              "type": "object",
+              "required": [
+                "name",
+                "num"
+              ],
+              "properties": {
+                "name": {
+                  "type": "string",
+                  "description": "计数器名称",
+                  "example": "demo"
+                },
+                "num": {
+                  "description": "计数器数值（`demo` 可能是字符串）",
+                  "oneOf": [
+                    {
+                      "type": "integer",
+                      "example": 123
+                    },
+                    {
+                      "type": "string",
+                      "example": "0123456789"
+                    }
+                  ]
+                }
+              }
+            },
+            "ErrorResponse": {
+              "type": "object",
+              "required": [
+                "code",
+                "message"
+              ],
+              "properties": {
+                "code": {
+                  "type": "integer",
+                  "example": 400
+                },
+                "message": {
+                  "type": "string",
+                  "example": "The field `name` is invalid. String must contain at most 32 character(s)"
+                }
+              }
+            }
+          }
+        }
+      },
+      "endpoints": [
+        {
+          "service": "moe-counter",
+          "version": "v1",
+          "method": "get",
+          "path": "/",
+          "operationId": "getHomePage",
+          "summary": "首页",
+          "description": "返回服务的首页（HTML），包含主题展示与参数说明。",
+          "tags": [
+            "counter"
+          ],
+          "deprecated": false,
+          "parameters": [],
+          "responses": [
+            {
+              "status": "200",
+              "description": "成功返回首页"
+            }
+          ],
+          "searchText": "getHomePage\n/\n首页\n返回服务的首页（HTML），包含主题展示与参数说明。\ncounter",
+          "curlExample": "curl -X GET 'https://api.f1a.me/moe-counter/' -H 'Accept: application/json'",
+          "codeExamples": {
+            "fetch": "import fetch from 'node-fetch';\n\nfetch('https://api.f1a.me/moe-counter/', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+            "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://api.f1a.me/moe-counter/', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+            "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get('https://api.f1a.me/moe-counter/', headers=headers)\n"
+          }
+        },
+        {
+          "service": "moe-counter",
+          "version": "v1",
+          "method": "get",
+          "path": "/@{name}",
+          "operationId": "getCounterSvg",
+          "summary": "获取计数器 SVG",
+          "description": "生成指定计数器的 SVG 图片。\n\n说明：\n- `name=demo` 会返回示例计数（特殊值）。\n- 当 `theme=random` 时会随机选择主题。\n",
+          "tags": [
+            "counter"
+          ],
+          "deprecated": false,
+          "parameters": [
+            {
+              "name": "name",
+              "in": "path",
+              "required": true,
+              "description": "计数器名称（唯一标识）",
+              "schema": {
+                "type": "string",
+                "maxLength": 32
+              }
+            },
+            {
+              "name": "theme",
+              "in": "query",
+              "required": false,
+              "description": "主题名称，`random` 表示随机",
+              "schema": {
+                "type": "string",
+                "default": "moebooru"
+              }
+            },
+            {
+              "name": "padding",
+              "in": "query",
+              "required": false,
+              "description": "最小位数（不足补 0），范围 0-16",
+              "schema": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 16,
+                "default": 7
+              }
+            },
+            {
+              "name": "offset",
+              "in": "query",
+              "required": false,
+              "description": "数字间的像素偏移，范围 -500~500",
+              "schema": {
+                "type": "number",
+                "minimum": -500,
+                "maximum": 500,
+                "default": 0
+              }
+            },
+            {
+              "name": "align",
+              "in": "query",
+              "required": false,
+              "description": "垂直对齐方式",
+              "schema": {
+                "type": "string",
+                "enum": [
+                  "top",
+                  "center",
+                  "bottom"
+                ],
+                "default": "top"
+              }
+            },
+            {
+              "name": "scale",
+              "in": "query",
+              "required": false,
+              "description": "缩放比例，范围 0.1~2",
+              "schema": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2,
+                "default": 1
+              }
+            },
+            {
+              "name": "pixelated",
+              "in": "query",
+              "required": false,
+              "description": "是否开启像素化渲染（0/1）",
+              "schema": {
+                "type": "string",
+                "enum": [
+                  "0",
+                  "1"
+                ],
+                "default": "1"
+              }
+            },
+            {
+              "name": "darkmode",
+              "in": "query",
+              "required": false,
+              "description": "暗色模式（0/1/auto）",
+              "schema": {
+                "type": "string",
+                "enum": [
+                  "0",
+                  "1",
+                  "auto"
+                ],
+                "default": "auto"
+              }
+            },
+            {
+              "name": "num",
+              "in": "query",
+              "required": false,
+              "description": "直接指定展示数字；`0` 表示禁用（默认）。\n大于 0 时，会以该数值渲染，而不会自增。\n",
+              "schema": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000000000000000,
+                "default": 0
+              }
+            },
+            {
+              "name": "prefix",
+              "in": "query",
+              "required": false,
+              "description": "前缀数字；`-1` 表示禁用",
+              "schema": {
+                "type": "integer",
+                "minimum": -1,
+                "maximum": 999999,
+                "default": -1
+              }
+            }
+          ],
+          "responses": [
+            {
+              "status": "200",
+              "description": "成功返回 SVG 图片"
+            },
+            {
+              "status": "400",
+              "description": "参数校验失败",
+              "schema": {
+                "$ref": "#/components/schemas/ErrorResponse"
+              },
+              "resolvedSchema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "integer"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ]
+              },
+              "exampleJson": "{\n  \"code\": 400,\n  \"message\": \"The field `name` is invalid. String must contain at most 32 character(s)\"\n}"
+            }
+          ],
+          "searchText": "getCounterSvg\n/@{name}\n获取计数器 SVG\n生成指定计数器的 SVG 图片。\n\n说明：\n- `name=demo` 会返回示例计数（特殊值）。\n- 当 `theme=random` 时会随机选择主题。\n\ncounter",
+          "curlExample": "curl -X GET 'https://api.f1a.me/moe-counter/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>' -H 'Accept: application/json'",
+          "codeExamples": {
+            "fetch": "import fetch from 'node-fetch';\n\nfetch('https://api.f1a.me/moe-counter/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+            "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://api.f1a.me/moe-counter/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+            "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get(\n    'https://api.f1a.me/moe-counter/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>',\n    headers=headers,\n)\n"
+          }
+        },
+        {
+          "service": "moe-counter",
+          "version": "v1",
+          "method": "get",
+          "path": "/get/@{name}",
+          "operationId": "getCounterSvgAlias",
+          "summary": "获取计数器 SVG（别名）",
+          "description": "与 `/@{name}` 等价的别名路径。",
+          "tags": [
+            "counter"
+          ],
+          "deprecated": false,
+          "parameters": [
+            {
+              "name": "name",
+              "in": "path",
+              "required": true,
+              "description": "计数器名称（唯一标识）",
+              "schema": {
+                "type": "string",
+                "maxLength": 32
+              }
+            },
+            {
+              "name": "theme",
+              "in": "query",
+              "required": false,
+              "description": "主题名称，`random` 表示随机",
+              "schema": {
+                "type": "string",
+                "default": "moebooru"
+              }
+            },
+            {
+              "name": "padding",
+              "in": "query",
+              "required": false,
+              "description": "最小位数（不足补 0），范围 0-16",
+              "schema": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 16,
+                "default": 7
+              }
+            },
+            {
+              "name": "offset",
+              "in": "query",
+              "required": false,
+              "description": "数字间的像素偏移，范围 -500~500",
+              "schema": {
+                "type": "number",
+                "minimum": -500,
+                "maximum": 500,
+                "default": 0
+              }
+            },
+            {
+              "name": "align",
+              "in": "query",
+              "required": false,
+              "description": "垂直对齐方式",
+              "schema": {
+                "type": "string",
+                "enum": [
+                  "top",
+                  "center",
+                  "bottom"
+                ],
+                "default": "top"
+              }
+            },
+            {
+              "name": "scale",
+              "in": "query",
+              "required": false,
+              "description": "缩放比例，范围 0.1~2",
+              "schema": {
+                "type": "number",
+                "minimum": 0.1,
+                "maximum": 2,
+                "default": 1
+              }
+            },
+            {
+              "name": "pixelated",
+              "in": "query",
+              "required": false,
+              "description": "是否开启像素化渲染（0/1）",
+              "schema": {
+                "type": "string",
+                "enum": [
+                  "0",
+                  "1"
+                ],
+                "default": "1"
+              }
+            },
+            {
+              "name": "darkmode",
+              "in": "query",
+              "required": false,
+              "description": "暗色模式（0/1/auto）",
+              "schema": {
+                "type": "string",
+                "enum": [
+                  "0",
+                  "1",
+                  "auto"
+                ],
+                "default": "auto"
+              }
+            },
+            {
+              "name": "num",
+              "in": "query",
+              "required": false,
+              "description": "直接指定展示数字；`0` 表示禁用（默认）",
+              "schema": {
+                "type": "integer",
+                "minimum": 0,
+                "maximum": 1000000000000000,
+                "default": 0
+              }
+            },
+            {
+              "name": "prefix",
+              "in": "query",
+              "required": false,
+              "description": "前缀数字；`-1` 表示禁用",
+              "schema": {
+                "type": "integer",
+                "minimum": -1,
+                "maximum": 999999,
+                "default": -1
+              }
+            }
+          ],
+          "responses": [
+            {
+              "status": "200",
+              "description": "成功返回 SVG 图片"
+            },
+            {
+              "status": "400",
+              "description": "参数校验失败",
+              "schema": {
+                "$ref": "#/components/schemas/ErrorResponse"
+              },
+              "resolvedSchema": {
+                "type": "object",
+                "properties": {
+                  "code": {
+                    "type": "integer"
+                  },
+                  "message": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "code",
+                  "message"
+                ]
+              },
+              "exampleJson": "{\n  \"code\": 400,\n  \"message\": \"The field `name` is invalid. String must contain at most 32 character(s)\"\n}"
+            }
+          ],
+          "searchText": "getCounterSvgAlias\n/get/@{name}\n获取计数器 SVG（别名）\n与 `/@{name}` 等价的别名路径。\ncounter",
+          "curlExample": "curl -X GET 'https://api.f1a.me/moe-counter/get/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>' -H 'Accept: application/json'",
+          "codeExamples": {
+            "fetch": "import fetch from 'node-fetch';\n\nfetch('https://api.f1a.me/moe-counter/get/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+            "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://api.f1a.me/moe-counter/get/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+            "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get(\n    'https://api.f1a.me/moe-counter/get/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>',\n    headers=headers,\n)\n"
+          }
+        },
+        {
+          "service": "moe-counter",
+          "version": "v1",
+          "method": "get",
+          "path": "/record/@{name}",
+          "operationId": "getCounterRecord",
+          "summary": "获取计数器记录（JSON）",
+          "description": "返回计数器当前值（会自增并写入存储）。",
+          "tags": [
+            "record"
+          ],
+          "deprecated": false,
+          "parameters": [
+            {
+              "name": "name",
+              "in": "path",
+              "required": true,
+              "description": "计数器名称（唯一标识）",
+              "schema": {
+                "type": "string",
+                "maxLength": 32
+              }
+            }
+          ],
+          "responses": [
+            {
+              "status": "200",
+              "description": "成功返回计数器记录",
+              "schema": {
+                "$ref": "#/components/schemas/CounterRecord"
+              },
+              "resolvedSchema": {
+                "type": "object",
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "description": "计数器名称"
+                  },
+                  "num": {
+                    "description": "计数器数值（`demo` 可能是字符串）"
+                  }
+                },
+                "required": [
+                  "name",
+                  "num"
+                ]
+              },
+              "exampleJson": "{\n  \"name\": \"demo\",\n  \"num\": null\n}"
+            }
+          ],
+          "searchText": "getCounterRecord\n/record/@{name}\n获取计数器记录（JSON）\n返回计数器当前值（会自增并写入存储）。\nrecord",
+          "curlExample": "curl -X GET 'https://api.f1a.me/moe-counter/record/@<name>' -H 'Accept: application/json'",
+          "codeExamples": {
+            "fetch": "import fetch from 'node-fetch';\n\nfetch('https://api.f1a.me/moe-counter/record/@<name>', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+            "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://api.f1a.me/moe-counter/record/@<name>', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+            "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get('https://api.f1a.me/moe-counter/record/@<name>', headers=headers)\n"
+          }
+        },
+        {
+          "service": "moe-counter",
+          "version": "v1",
+          "method": "get",
+          "path": "/heart-beat",
+          "operationId": "getHeartBeat",
+          "summary": "健康检查",
+          "description": "返回 `alive` 字符串。",
+          "tags": [
+            "health"
+          ],
+          "deprecated": false,
+          "parameters": [],
+          "responses": [
+            {
+              "status": "200",
+              "description": "服务正常"
+            }
+          ],
+          "searchText": "getHeartBeat\n/heart-beat\n健康检查\n返回 `alive` 字符串。\nhealth",
+          "curlExample": "curl -X GET 'https://api.f1a.me/moe-counter/heart-beat' -H 'Accept: application/json'",
+          "codeExamples": {
+            "fetch": "import fetch from 'node-fetch';\n\nfetch('https://api.f1a.me/moe-counter/heart-beat', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+            "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://api.f1a.me/moe-counter/heart-beat', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+            "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get('https://api.f1a.me/moe-counter/heart-beat', headers=headers)\n"
+          }
+        }
+      ]
     }
   ],
   "allEndpoints": [
@@ -1975,6 +2985,468 @@ export const apiSpecs: ApiSpecsGenerated = {
         "fetch": "import fetch from 'node-fetch';\n\nfetch('https://api.f1a.me/github-contributions-api/v4/<username>?y=<y>&format=<format>', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
         "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://api.f1a.me/github-contributions-api/v4/<username>?y=<y>&format=<format>', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
         "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get('https://api.f1a.me/github-contributions-api/v4/<username>?y=<y>&format=<format>', headers=headers)\n"
+      }
+    },
+    {
+      "service": "moe-counter",
+      "version": "v1",
+      "method": "get",
+      "path": "/",
+      "operationId": "getHomePage",
+      "summary": "首页",
+      "description": "返回服务的首页（HTML），包含主题展示与参数说明。",
+      "tags": [
+        "counter"
+      ],
+      "deprecated": false,
+      "parameters": [],
+      "responses": [
+        {
+          "status": "200",
+          "description": "成功返回首页"
+        }
+      ],
+      "searchText": "getHomePage\n/\n首页\n返回服务的首页（HTML），包含主题展示与参数说明。\ncounter",
+      "curlExample": "curl -X GET 'https://api.f1a.me/moe-counter/' -H 'Accept: application/json'",
+      "codeExamples": {
+        "fetch": "import fetch from 'node-fetch';\n\nfetch('https://api.f1a.me/moe-counter/', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+        "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://api.f1a.me/moe-counter/', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+        "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get('https://api.f1a.me/moe-counter/', headers=headers)\n"
+      }
+    },
+    {
+      "service": "moe-counter",
+      "version": "v1",
+      "method": "get",
+      "path": "/@{name}",
+      "operationId": "getCounterSvg",
+      "summary": "获取计数器 SVG",
+      "description": "生成指定计数器的 SVG 图片。\n\n说明：\n- `name=demo` 会返回示例计数（特殊值）。\n- 当 `theme=random` 时会随机选择主题。\n",
+      "tags": [
+        "counter"
+      ],
+      "deprecated": false,
+      "parameters": [
+        {
+          "name": "name",
+          "in": "path",
+          "required": true,
+          "description": "计数器名称（唯一标识）",
+          "schema": {
+            "type": "string",
+            "maxLength": 32
+          }
+        },
+        {
+          "name": "theme",
+          "in": "query",
+          "required": false,
+          "description": "主题名称，`random` 表示随机",
+          "schema": {
+            "type": "string",
+            "default": "moebooru"
+          }
+        },
+        {
+          "name": "padding",
+          "in": "query",
+          "required": false,
+          "description": "最小位数（不足补 0），范围 0-16",
+          "schema": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 16,
+            "default": 7
+          }
+        },
+        {
+          "name": "offset",
+          "in": "query",
+          "required": false,
+          "description": "数字间的像素偏移，范围 -500~500",
+          "schema": {
+            "type": "number",
+            "minimum": -500,
+            "maximum": 500,
+            "default": 0
+          }
+        },
+        {
+          "name": "align",
+          "in": "query",
+          "required": false,
+          "description": "垂直对齐方式",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "top",
+              "center",
+              "bottom"
+            ],
+            "default": "top"
+          }
+        },
+        {
+          "name": "scale",
+          "in": "query",
+          "required": false,
+          "description": "缩放比例，范围 0.1~2",
+          "schema": {
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 2,
+            "default": 1
+          }
+        },
+        {
+          "name": "pixelated",
+          "in": "query",
+          "required": false,
+          "description": "是否开启像素化渲染（0/1）",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "0",
+              "1"
+            ],
+            "default": "1"
+          }
+        },
+        {
+          "name": "darkmode",
+          "in": "query",
+          "required": false,
+          "description": "暗色模式（0/1/auto）",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "0",
+              "1",
+              "auto"
+            ],
+            "default": "auto"
+          }
+        },
+        {
+          "name": "num",
+          "in": "query",
+          "required": false,
+          "description": "直接指定展示数字；`0` 表示禁用（默认）。\n大于 0 时，会以该数值渲染，而不会自增。\n",
+          "schema": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000000000000000,
+            "default": 0
+          }
+        },
+        {
+          "name": "prefix",
+          "in": "query",
+          "required": false,
+          "description": "前缀数字；`-1` 表示禁用",
+          "schema": {
+            "type": "integer",
+            "minimum": -1,
+            "maximum": 999999,
+            "default": -1
+          }
+        }
+      ],
+      "responses": [
+        {
+          "status": "200",
+          "description": "成功返回 SVG 图片"
+        },
+        {
+          "status": "400",
+          "description": "参数校验失败",
+          "schema": {
+            "$ref": "#/components/schemas/ErrorResponse"
+          },
+          "resolvedSchema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ]
+          },
+          "exampleJson": "{\n  \"code\": 400,\n  \"message\": \"The field `name` is invalid. String must contain at most 32 character(s)\"\n}"
+        }
+      ],
+      "searchText": "getCounterSvg\n/@{name}\n获取计数器 SVG\n生成指定计数器的 SVG 图片。\n\n说明：\n- `name=demo` 会返回示例计数（特殊值）。\n- 当 `theme=random` 时会随机选择主题。\n\ncounter",
+      "curlExample": "curl -X GET 'https://api.f1a.me/moe-counter/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>' -H 'Accept: application/json'",
+      "codeExamples": {
+        "fetch": "import fetch from 'node-fetch';\n\nfetch('https://api.f1a.me/moe-counter/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+        "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://api.f1a.me/moe-counter/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+        "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get(\n    'https://api.f1a.me/moe-counter/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>',\n    headers=headers,\n)\n"
+      }
+    },
+    {
+      "service": "moe-counter",
+      "version": "v1",
+      "method": "get",
+      "path": "/get/@{name}",
+      "operationId": "getCounterSvgAlias",
+      "summary": "获取计数器 SVG（别名）",
+      "description": "与 `/@{name}` 等价的别名路径。",
+      "tags": [
+        "counter"
+      ],
+      "deprecated": false,
+      "parameters": [
+        {
+          "name": "name",
+          "in": "path",
+          "required": true,
+          "description": "计数器名称（唯一标识）",
+          "schema": {
+            "type": "string",
+            "maxLength": 32
+          }
+        },
+        {
+          "name": "theme",
+          "in": "query",
+          "required": false,
+          "description": "主题名称，`random` 表示随机",
+          "schema": {
+            "type": "string",
+            "default": "moebooru"
+          }
+        },
+        {
+          "name": "padding",
+          "in": "query",
+          "required": false,
+          "description": "最小位数（不足补 0），范围 0-16",
+          "schema": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 16,
+            "default": 7
+          }
+        },
+        {
+          "name": "offset",
+          "in": "query",
+          "required": false,
+          "description": "数字间的像素偏移，范围 -500~500",
+          "schema": {
+            "type": "number",
+            "minimum": -500,
+            "maximum": 500,
+            "default": 0
+          }
+        },
+        {
+          "name": "align",
+          "in": "query",
+          "required": false,
+          "description": "垂直对齐方式",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "top",
+              "center",
+              "bottom"
+            ],
+            "default": "top"
+          }
+        },
+        {
+          "name": "scale",
+          "in": "query",
+          "required": false,
+          "description": "缩放比例，范围 0.1~2",
+          "schema": {
+            "type": "number",
+            "minimum": 0.1,
+            "maximum": 2,
+            "default": 1
+          }
+        },
+        {
+          "name": "pixelated",
+          "in": "query",
+          "required": false,
+          "description": "是否开启像素化渲染（0/1）",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "0",
+              "1"
+            ],
+            "default": "1"
+          }
+        },
+        {
+          "name": "darkmode",
+          "in": "query",
+          "required": false,
+          "description": "暗色模式（0/1/auto）",
+          "schema": {
+            "type": "string",
+            "enum": [
+              "0",
+              "1",
+              "auto"
+            ],
+            "default": "auto"
+          }
+        },
+        {
+          "name": "num",
+          "in": "query",
+          "required": false,
+          "description": "直接指定展示数字；`0` 表示禁用（默认）",
+          "schema": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 1000000000000000,
+            "default": 0
+          }
+        },
+        {
+          "name": "prefix",
+          "in": "query",
+          "required": false,
+          "description": "前缀数字；`-1` 表示禁用",
+          "schema": {
+            "type": "integer",
+            "minimum": -1,
+            "maximum": 999999,
+            "default": -1
+          }
+        }
+      ],
+      "responses": [
+        {
+          "status": "200",
+          "description": "成功返回 SVG 图片"
+        },
+        {
+          "status": "400",
+          "description": "参数校验失败",
+          "schema": {
+            "$ref": "#/components/schemas/ErrorResponse"
+          },
+          "resolvedSchema": {
+            "type": "object",
+            "properties": {
+              "code": {
+                "type": "integer"
+              },
+              "message": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "code",
+              "message"
+            ]
+          },
+          "exampleJson": "{\n  \"code\": 400,\n  \"message\": \"The field `name` is invalid. String must contain at most 32 character(s)\"\n}"
+        }
+      ],
+      "searchText": "getCounterSvgAlias\n/get/@{name}\n获取计数器 SVG（别名）\n与 `/@{name}` 等价的别名路径。\ncounter",
+      "curlExample": "curl -X GET 'https://api.f1a.me/moe-counter/get/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>' -H 'Accept: application/json'",
+      "codeExamples": {
+        "fetch": "import fetch from 'node-fetch';\n\nfetch('https://api.f1a.me/moe-counter/get/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+        "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://api.f1a.me/moe-counter/get/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+        "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get(\n    'https://api.f1a.me/moe-counter/get/@<name>?theme=<theme>&padding=<padding>&offset=<offset>&align=<align>&scale=<scale>&pixelated=<pixelated>&darkmode=<darkmode>&num=<num>&prefix=<prefix>',\n    headers=headers,\n)\n"
+      }
+    },
+    {
+      "service": "moe-counter",
+      "version": "v1",
+      "method": "get",
+      "path": "/record/@{name}",
+      "operationId": "getCounterRecord",
+      "summary": "获取计数器记录（JSON）",
+      "description": "返回计数器当前值（会自增并写入存储）。",
+      "tags": [
+        "record"
+      ],
+      "deprecated": false,
+      "parameters": [
+        {
+          "name": "name",
+          "in": "path",
+          "required": true,
+          "description": "计数器名称（唯一标识）",
+          "schema": {
+            "type": "string",
+            "maxLength": 32
+          }
+        }
+      ],
+      "responses": [
+        {
+          "status": "200",
+          "description": "成功返回计数器记录",
+          "schema": {
+            "$ref": "#/components/schemas/CounterRecord"
+          },
+          "resolvedSchema": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string",
+                "description": "计数器名称"
+              },
+              "num": {
+                "description": "计数器数值（`demo` 可能是字符串）"
+              }
+            },
+            "required": [
+              "name",
+              "num"
+            ]
+          },
+          "exampleJson": "{\n  \"name\": \"demo\",\n  \"num\": null\n}"
+        }
+      ],
+      "searchText": "getCounterRecord\n/record/@{name}\n获取计数器记录（JSON）\n返回计数器当前值（会自增并写入存储）。\nrecord",
+      "curlExample": "curl -X GET 'https://api.f1a.me/moe-counter/record/@<name>' -H 'Accept: application/json'",
+      "codeExamples": {
+        "fetch": "import fetch from 'node-fetch';\n\nfetch('https://api.f1a.me/moe-counter/record/@<name>', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+        "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://api.f1a.me/moe-counter/record/@<name>', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+        "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get('https://api.f1a.me/moe-counter/record/@<name>', headers=headers)\n"
+      }
+    },
+    {
+      "service": "moe-counter",
+      "version": "v1",
+      "method": "get",
+      "path": "/heart-beat",
+      "operationId": "getHeartBeat",
+      "summary": "健康检查",
+      "description": "返回 `alive` 字符串。",
+      "tags": [
+        "health"
+      ],
+      "deprecated": false,
+      "parameters": [],
+      "responses": [
+        {
+          "status": "200",
+          "description": "服务正常"
+        }
+      ],
+      "searchText": "getHeartBeat\n/heart-beat\n健康检查\n返回 `alive` 字符串。\nhealth",
+      "curlExample": "curl -X GET 'https://api.f1a.me/moe-counter/heart-beat' -H 'Accept: application/json'",
+      "codeExamples": {
+        "fetch": "import fetch from 'node-fetch';\n\nfetch('https://api.f1a.me/moe-counter/heart-beat', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+        "axios": "import axios from 'axios';\n\nconst response = await axios.get('https://api.f1a.me/moe-counter/heart-beat', {\n  headers: {\n    'Accept': 'application/json'\n  }\n});\n",
+        "python": "import requests\n\nheaders = {\n    'Accept': 'application/json',\n}\n\nresponse = requests.get('https://api.f1a.me/moe-counter/heart-beat', headers=headers)\n"
       }
     }
   ]

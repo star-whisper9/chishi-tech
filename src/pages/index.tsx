@@ -1,6 +1,7 @@
 import React from "react";
 import {
   AspectRatio,
+  GridOnRounded,
   QrCode2Rounded,
   VideoFileRounded,
 } from "@mui/icons-material";
@@ -62,6 +63,14 @@ export const pages: Page[] = [
     description: "使用 AI 模型放大图片，提升图片质量。",
     lastUpdated: "2025-12-10",
     link: "/upscayl",
+    shit: false,
+  },
+  {
+    title: "拼图",
+    icon: <GridOnRounded color="primary" fontSize="large" />,
+    description: "多布局图片拼接，支持调整填充模式与导出。",
+    lastUpdated: "2026-2-10",
+    link: "/collage",
     shit: false,
   },
 ];

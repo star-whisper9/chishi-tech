@@ -5,6 +5,7 @@ import PageLoadingFallback from "../components/common/PageLoadingFallback";
 // 懒加载页面组件
 const ExamplePage = lazy(() => import("../pages/Example"));
 const QrClockPage = lazy(() => import("../pages/QrClock"));
+const CollagePage = lazy(() => import("../pages/Collage"));
 const BadVideoPage = lazy(() => import("../pages/BadVideo"));
 const VideoConvertorPage = lazy(() => import("../pages/VideoConvertor"));
 const UpscaylPage = lazy(() => import("../pages/Upscayl"));
@@ -53,5 +54,9 @@ export const router = createBrowserRouter([
   {
     path: "/api/:service/:version",
     element: withSuspense(ApiDetailPage),
+  },
+  {
+    path: "/collage",
+    element: withSuspense(CollagePage),
   },
 ]);

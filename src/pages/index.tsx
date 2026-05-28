@@ -1,6 +1,7 @@
 import React from "react";
 import {
   AspectRatio,
+  AutoAwesomeRounded,
   GridOnRounded,
   QrCode2Rounded,
   VideoFileRounded,
@@ -71,6 +72,14 @@ export const pages: Page[] = [
     description: "多布局图片拼接，支持调整填充模式与导出。",
     lastUpdated: "2026-2-10",
     link: "/collage",
+    shit: false,
+  },
+  {
+    title: "AI 画皮肤(Demo)",
+    icon: <AutoAwesomeRounded color="primary" fontSize="large" />,
+    description: "输入提示词，AI 为你生成 Minecraft 皮肤。",
+    lastUpdated: "2026-5-28",
+    link: "/skingen",
     shit: false,
   },
 ];

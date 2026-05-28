@@ -9,6 +9,7 @@ const CollagePage = lazy(() => import("../pages/Collage"));
 const BadVideoPage = lazy(() => import("../pages/BadVideo"));
 const VideoConvertorPage = lazy(() => import("../pages/VideoConvertor"));
 const UpscaylPage = lazy(() => import("../pages/Upscayl"));
+const SkinGenPage = lazy(() => import("../pages/SkinGen"));
 const ApiListPage = lazy(() => import("../pages/ApiList"));
 const ApiDetailPage = lazy(() => import("../pages/ApiDetail"));
 
@@ -58,5 +59,9 @@ export const router = createBrowserRouter([
   {
     path: "/collage",
     element: withSuspense(CollagePage),
+  },
+  {
+    path: "/skingen",
+    element: withSuspense(SkinGenPage),
   },
 ]);

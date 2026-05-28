@@ -25,6 +25,19 @@ export const CONSTS = {
     MIN_PERCENT: 0.00001,
     MAX_PERCENT: 0.01,
   },
+  // AI 皮肤生成功能配置
+  SKIN_GEN: {
+    API_BASE_URL: "http://localhost:8000",
+    // 轮询间隔（毫秒）
+    POLL_INTERVAL_MS: 5000,
+    // 最大轮询次数
+    MAX_POLL_COUNT: 300,
+    // prompt 长度限制
+    PROMPT_MIN_LEN: 1,
+    PROMPT_MAX_LEN: 500,
+    // 预估每次生成耗时（毫秒）
+    ESTIMATED_GENERATE_MS: 150000,
+  },
   // Upscayl 图像放大功能配置
   UPSCAYL: {
     // API 基础路径（默认为相对路径，生产环境需配置完整 URL）

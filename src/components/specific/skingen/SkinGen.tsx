@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useEffect, useCallback, useReducer } from "react";
 import {
   Box,
   Button,
@@ -42,10 +42,9 @@ const formatElapsed = (seconds: number): string => {
 };
 
 const TimerDisplay: React.FC<{ createdAt: number }> = ({ createdAt }) => {
-  const [tick, setTick] = useState(0);
-
+  const [, forceUpdate] = useReducer((x) => x + 1, 0);
   useEffect(() => {
-    const id = setInterval(() => setTick((n) => n + 1), 1000);
+    const id = setInterval(forceUpdate, 1000);
     return () => clearInterval(id);
   }, []);
 

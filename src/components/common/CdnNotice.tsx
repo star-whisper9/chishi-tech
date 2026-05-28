@@ -9,7 +9,6 @@ import {
   Alert,
   Typography,
 } from "@mui/material";
-import { WarningRounded } from "@mui/icons-material";
 
 const STORAGE_KEY = "cdn-notice-dismissed";
 

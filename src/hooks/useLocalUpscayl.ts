@@ -24,7 +24,7 @@ const dataUrlToImage = (dataUrl: string): Promise<HTMLImageElement> =>
   });
 
 ort.env.wasm.wasmPaths =
-  "https://cdn.jsdmirror.com/npm/onnxruntime-web@1.23.2/dist/";
+  "https://cdn.jsdelivr.net/npm/onnxruntime-web@1.26.0/dist/";
 
 export interface LocalModel {
   name: string;
@@ -94,7 +94,7 @@ export const useLocalUpscayl = () => {
         setModelLoading(false);
       }
     },
-    [session, currentModelPath]
+    [session, currentModelPath],
   );
 
   const runTiledInference = useCallback(
@@ -103,7 +103,7 @@ export const useLocalUpscayl = () => {
       img: HTMLImageElement,
       tileSize: number,
       onProgress: (progress: number) => void,
-      isCanceled: () => boolean
+      isCanceled: () => boolean,
     ): Promise<string | null> => {
       if (isCanceled()) return null;
 
@@ -226,7 +226,7 @@ export const useLocalUpscayl = () => {
             const outTileImageData = tensorToImageData(
               outputData,
               out_padded_w,
-              out_padded_h
+              out_padded_h,
             );
 
             if (
@@ -262,7 +262,7 @@ export const useLocalUpscayl = () => {
               dst_x,
               dst_y,
               src_crop_w,
-              src_crop_h // 目标区域
+              src_crop_h, // 目标区域
             );
 
             // 同步处理 alpha：不加 padding，直接对 tile 区域做平滑放大
@@ -275,7 +275,7 @@ export const useLocalUpscayl = () => {
               dst_x,
               dst_y,
               src_crop_w,
-              src_crop_h
+              src_crop_h,
             );
           } finally {
             if (inputTensor) inputTensor.dispose();
@@ -298,13 +298,13 @@ export const useLocalUpscayl = () => {
         0,
         0,
         alphaOutCanvas.width,
-        alphaOutCanvas.height
+        alphaOutCanvas.height,
       );
       const outImageData = outCtx.getImageData(
         0,
         0,
         outCanvas.width,
-        outCanvas.height
+        outCanvas.height,
       );
       const alphaPixels = alphaData.data;
       const outPixels = outImageData.data;
@@ -319,7 +319,7 @@ export const useLocalUpscayl = () => {
 
       return outCanvas.toDataURL("image/png");
     },
-    []
+    [],
   );
 
   const computeTileSize = useCallback((img: HTMLImageElement) => {
@@ -366,18 +366,18 @@ export const useLocalUpscayl = () => {
 
         const runPass = async (
           inputImg: HTMLImageElement,
-          progressMapper: (p: number) => void
+          progressMapper: (p: number) => void,
         ) => {
           const tileSize = computeTileSize(inputImg);
           console.log(
-            `Image size: ${inputImg.width}x${inputImg.height}, using tile size: ${tileSize}`
+            `Image size: ${inputImg.width}x${inputImg.height}, using tile size: ${tileSize}`,
           );
           return runTiledInference(
             session,
             inputImg,
             tileSize,
             progressMapper,
-            () => abortRef.current
+            () => abortRef.current,
           );
         };
 
@@ -420,7 +420,7 @@ export const useLocalUpscayl = () => {
               0,
               0,
               downCanvas.width,
-              downCanvas.height
+              downCanvas.height,
             );
             finalUrl = downCanvas.toDataURL("image/png");
           }
@@ -440,7 +440,7 @@ export const useLocalUpscayl = () => {
         setProcessing(false);
       }
     },
-    [session, runTiledInference, computeTileSize]
+    [session, runTiledInference, computeTileSize],
   );
 
   const cancel = useCallback(() => {

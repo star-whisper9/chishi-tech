@@ -1,6 +1,6 @@
 import { useState, useRef, useCallback } from "react";
 import { FFFSType, FFmpeg } from "@ffmpeg/ffmpeg";
-import { toBlobURL, fetchFile } from "@ffmpeg/util";
+import { fetchFile } from "@ffmpeg/util";
 import { CONSTS } from "../config/consts";
 import {
   isWorkerFSSupported,
@@ -44,6 +44,38 @@ export interface UseVideoConvertorReturn {
 }
 
 export const useVideoConvertor = (): UseVideoConvertorReturn => {
+  const CDN_TIMEOUT_MS = 15000;
+
+  /**
+   * 带超时的 toBlobURL 封装，防止 CDN 不可达时长时间阻塞
+   */
+  const toBlobURLWithTimeout = async (
+    url: string,
+    mimeType: string,
+    timeoutMs: number = CDN_TIMEOUT_MS
+  ): Promise<string> => {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      const response = await fetch(url, { signal: controller.signal });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+      }
+      const buf = await response.arrayBuffer();
+      const blob = new Blob([buf], { type: mimeType });
+      return URL.createObjectURL(blob);
+    } catch (err) {
+      if (err instanceof DOMException && err.name === "AbortError") {
+        throw new Error(
+          `CDN 加载超时（${timeoutMs / 1000}s）：${url}\n请检查网络连接或使用 VPN`
+        );
+      }
+      throw err;
+    } finally {
+      clearTimeout(timeoutId);
+    }
+  };
+
   const [isLoading, setIsLoading] = useState(false);
   const [isConverting, setIsConverting] = useState(false);
   const [progress, setProgress] = useState<ConversionProgress | null>(null);
@@ -96,15 +128,15 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
         console.log("[FFmpeg] 正在加载多线程版本...");
         const baseURL_MT = CONSTS.CDN_PACKAGES.FFMPEG_MT;
         await ffmpeg.load({
-          coreURL: await toBlobURL(
+          coreURL: await toBlobURLWithTimeout(
             `${baseURL_MT}/ffmpeg-core.js`,
             "text/javascript"
           ),
-          wasmURL: await toBlobURL(
+          wasmURL: await toBlobURLWithTimeout(
             `${baseURL_MT}/ffmpeg-core.wasm`,
             "application/wasm"
           ),
-          workerURL: await toBlobURL(
+          workerURL: await toBlobURLWithTimeout(
             `${baseURL_MT}/ffmpeg-core.worker.js`,
             "text/javascript"
           ),
@@ -119,11 +151,11 @@ export const useVideoConvertor = (): UseVideoConvertorReturn => {
         try {
           const baseURL = CONSTS.CDN_PACKAGES.FFMPEG;
           await ffmpeg.load({
-            coreURL: await toBlobURL(
+            coreURL: await toBlobURLWithTimeout(
               `${baseURL}/ffmpeg-core.js`,
               "text/javascript"
             ),
-            wasmURL: await toBlobURL(
+            wasmURL: await toBlobURLWithTimeout(
               `${baseURL}/ffmpeg-core.wasm`,
               "application/wasm"
             ),

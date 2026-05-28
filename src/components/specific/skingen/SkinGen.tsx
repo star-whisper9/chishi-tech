@@ -1,4 +1,4 @@
-import React, { useEffect, useCallback, useReducer } from "react";
+import React, { useEffect, useCallback, useReducer, useState } from "react";
 import {
   Box,
   Button,
@@ -10,6 +10,8 @@ import {
   Alert,
   LinearProgress,
   Chip,
+  IconButton,
+  Tooltip,
 } from "@mui/material";
 import {
   AutoAwesomeRounded,
@@ -17,10 +19,12 @@ import {
   RefreshRounded,
   HourglassEmptyRounded,
   TimerRounded,
+  HelpOutlineRounded,
 } from "@mui/icons-material";
 import { useSkinGen } from "../../../hooks/useSkinGen";
 import { CONSTS } from "../../../config/consts";
 import SkinViewer3D from "./SkinViewer3D";
+import SkinGenHelp from "./SkinGenHelp";
 
 const formatWaitTime = (aheadCount: number): string => {
   const totalMs = (aheadCount + 1) * CONSTS.SKIN_GEN.ESTIMATED_GENERATE_MS;
@@ -82,6 +86,8 @@ const SkinGen: React.FC = () => {
 
   const promptLen = prompt.trim().length;
 
+  const [openHelp, setOpenHelp] = useState(false);
+
   const handleSubmit = useCallback(() => {
     submit();
   }, [submit]);
@@ -95,7 +101,14 @@ const SkinGen: React.FC = () => {
       <Card>
         <CardContent>
           <Stack spacing={2}>
-            <Typography variant="h6">AI 皮肤生成</Typography>
+            <Stack direction="row" alignItems="center" spacing={1}>
+              <Typography variant="h6">AI 皮肤生成</Typography>
+              <Tooltip title="查看帮助">
+                <IconButton size="small" onClick={() => setOpenHelp(true)}>
+                  <HelpOutlineRounded />
+                </IconButton>
+              </Tooltip>
+            </Stack>
 
             <TextField
               label="提示词"
@@ -340,6 +353,7 @@ const SkinGen: React.FC = () => {
           </CardContent>
         </Card>
       )}
+      <SkinGenHelp open={openHelp} onClose={() => setOpenHelp(false)} />
     </Stack>
   );
 };

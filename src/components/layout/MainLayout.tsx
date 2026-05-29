@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Container } from "@mui/material";
+import { Box, Container, type Breakpoint } from "@mui/material";
 import Header from "../common/Header";
 import Footer from "../common/Footer/Footer";
 import BackToTop from "../common/BackToTop";
@@ -9,12 +9,14 @@ interface MainLayoutProps {
   children: React.ReactNode;
   title?: string;
   titleSuffix?: string;
+  maxWidth?: Breakpoint;
 }
 
 const MainLayout: React.FC<MainLayoutProps> = ({
   children,
   title,
   titleSuffix,
+  maxWidth,
 }) => {
   return (
     <RootLayout title={title} titleSuffix={titleSuffix}>
@@ -27,7 +29,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({
       >
         <Header />
         <Container
-          maxWidth="lg"
+          maxWidth={maxWidth || "lg"}
           sx={{
             mt: 2,
             flexGrow: 1,

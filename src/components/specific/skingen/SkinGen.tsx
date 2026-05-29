@@ -104,7 +104,7 @@ const SkinGen: React.FC = () => {
     <Stack
       direction="row"
       spacing={3}
-      sx={{ margin: "0 auto", alignItems: "flex-start" }}
+      sx={{ margin: "0 auto", alignItems: "flex-start", width: "100%" }}
     >
       {/* 左侧：历史 */}
       <Box sx={{ width: "40%", flexShrink: 0 }}>
@@ -204,7 +204,10 @@ const SkinGen: React.FC = () => {
               >
                 (耗时{" "}
                 {formatElapsed(
-                  Math.max(0, (finishedAt ?? Math.floor(Date.now() / 1000)) - createdAt),
+                  Math.max(
+                    0,
+                    (finishedAt ?? Math.floor(Date.now() / 1000)) - createdAt,
+                  ),
                 )}
                 )
               </Box>
@@ -329,7 +332,11 @@ const SkinGen: React.FC = () => {
                     >
                       (耗时{" "}
                       {formatElapsed(
-                        Math.max(0, (finishedAt ?? Math.floor(Date.now() / 1000)) - createdAt),
+                        Math.max(
+                          0,
+                          (finishedAt ?? Math.floor(Date.now() / 1000)) -
+                            createdAt,
+                        ),
                       )}
                       )
                     </Box>

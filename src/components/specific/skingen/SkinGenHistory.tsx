@@ -10,7 +10,7 @@ import {
   Typography,
   Button,
 } from "@mui/material";
-import { DeleteRounded, VisibilityRounded } from "@mui/icons-material";
+import { DeleteRounded, VisibilityRounded, HistoryRounded } from "@mui/icons-material";
 import { type SkinGenHistoryItem } from "../../../hooks/useSkinGen";
 import { CONSTS } from "../../../config/consts";
 
@@ -69,16 +69,18 @@ const SkinGenHistory: React.FC<SkinGenHistoryProps> = ({
     [history],
   );
 
-  if (sortedHistory.length === 0) {
-    return null;
-  }
-
   return (
     <Card>
       <CardContent>
         <Typography variant="h6" gutterBottom>
           生成历史
         </Typography>
+        {sortedHistory.length === 0 ? (
+          <Stack spacing={1} alignItems="center" sx={{ py: 3, color: "text.secondary" }}>
+            <HistoryRounded sx={{ fontSize: 40, opacity: 0.4 }} />
+            <Typography variant="body2">暂无生成记录</Typography>
+          </Stack>
+        ) : (
         <Stack spacing={1} divider={<Divider flexItem />}>
           {sortedHistory.map((item) => {
             const displayStatus = getDisplayStatus(item);
@@ -138,6 +140,7 @@ const SkinGenHistory: React.FC<SkinGenHistoryProps> = ({
             );
           })}
         </Stack>
+        )}
       </CardContent>
     </Card>
   );

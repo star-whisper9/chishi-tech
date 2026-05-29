@@ -9,10 +9,10 @@ export default defineConfig({
   },
   server: {
     proxy: {
-      "/api/moe-counter": {
+      "/ext/moe-counter": {
         target: "https://api.f1a.me",
         changeOrigin: true,
-        rewrite: (path) => path.replace(/^\/api\/moe-counter/, "/moe-counter"),
+        rewrite: (path) => path.replace(/^\/ext\/moe-counter/, "/moe-counter"),
       },
     },
     headers: {

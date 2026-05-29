@@ -22,7 +22,7 @@ const Footer: React.FC = () => {
     >
       <Box display="flex" justifyContent="center" sx={{ mb: 2 }}>
         <img
-          src="/api/moe-counter/@chishi-tech?name=chishi-tech&theme=booru-lewd&padding=7&offset=0&align=top&scale=0.4&pixelated=1&darkmode=0"
+          src="/ext/moe-counter/@chishi-tech?name=chishi-tech&theme=booru-lewd&padding=7&offset=0&align=top&scale=0.4&pixelated=1&darkmode=0"
           alt="moe counter"
           loading="lazy"
           style={{ height: 40, imageRendering: "pixelated" }}

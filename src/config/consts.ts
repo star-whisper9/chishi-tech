@@ -37,6 +37,10 @@ export const CONSTS = {
     PROMPT_MAX_LEN: 500,
     // 预估每次生成耗时（毫秒）
     ESTIMATED_GENERATE_MS: 150000,
+    // 历史最大条目数
+    MAX_HISTORY: 20,
+    // 结果 TTL（秒）
+    TTL_SEC: 3600,
   },
   // Upscayl 本地图像放大功能配置
   UPSCAYL: {

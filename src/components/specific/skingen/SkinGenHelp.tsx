@@ -140,7 +140,7 @@ const SkinGenHelp: React.FC<SkinGenHelpProps> = ({ open, onClose }) => {
                 sx={{
                   p: 1.5,
                   borderRadius: 1,
-                  bgcolor: "grey.100",
+                  bgcolor: "action.hover",
                   color: "text.primary",
                   fontFamily: "monospace",
                   fontSize: 12,

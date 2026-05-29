@@ -8,6 +8,13 @@ export default defineConfig({
     exclude: ["@ffmpeg/ffmpeg", "@ffmpeg/util"],
   },
   server: {
+    proxy: {
+      "/api/moe-counter": {
+        target: "https://api.f1a.me",
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api\/moe-counter/, "/moe-counter"),
+      },
+    },
     headers: {
       "Cross-Origin-Opener-Policy": "same-origin",
       "Cross-Origin-Embedder-Policy": "require-corp",

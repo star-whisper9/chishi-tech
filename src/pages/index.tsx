@@ -1,12 +1,12 @@
 import React from "react";
 import {
   AspectRatio,
-  AutoAwesomeRounded,
   GridOnRounded,
   QrCode2Rounded,
   VideoFileRounded,
 } from "@mui/icons-material";
 import VideocamOffRoundedIcon from "@mui/icons-material/VideocamOffRounded";
+import AIGeneraionImage from "../components/common/Icons/AIGeneraionImage";
 // 位图两种使用方式：
 // 1) public 下直接 /xxx.png 访问（不指纹）
 // 2) src/assets 下 import 进来（构建指纹，推荐）
@@ -18,7 +18,7 @@ export type Page = {
   description: string;
   lastUpdated: string;
   link: string;
-  shit?: boolean; // 可选标记，false 时显示缎带标记，null/undefined/true 时不显示
+  shit?: boolean; // false 显示「精选」；true 显示「赤石」；不填则不显示
 };
 
 export const pages: Page[] = [
@@ -34,7 +34,6 @@ export const pages: Page[] = [
     description: "这是一个示例页面，展示了项目的基本结构。",
     lastUpdated: "2025-9-12",
     link: "/example",
-    shit: false, // 显示缎带标记
   },
   {
     title: "二维码时钟",
@@ -42,6 +41,7 @@ export const pages: Page[] = [
     description: "每秒更新的时间二维码，可选择常用时区。",
     lastUpdated: "2025-9-12",
     link: "/qrclock",
+    shit: true,
   },
   {
     title: "随机损坏 MP4",
@@ -49,6 +49,7 @@ export const pages: Page[] = [
     description: "导出一个每字节有概率损坏的 MP4 视频文件。",
     lastUpdated: "2025-9-13",
     link: "/badvideo",
+    shit: true,
   },
   {
     title: "视频格式转换器",
@@ -56,7 +57,6 @@ export const pages: Page[] = [
     description: "在本地快捷转换视频格式，同时支持视频转动图。",
     lastUpdated: "2025-10-11",
     link: "/videoconvertor",
-    shit: false,
   },
   {
     title: "图像放大",
@@ -76,7 +76,7 @@ export const pages: Page[] = [
   },
   {
     title: "AI 画皮肤(已下线)",
-    icon: <AutoAwesomeRounded color="primary" fontSize="large" />,
+    icon: <AIGeneraionImage color="primary" fontSize="large" />,
     description: "输入提示词，AI 为你生成 Minecraft 皮肤。",
     lastUpdated: "2026-6-15",
     link: "/skingen",

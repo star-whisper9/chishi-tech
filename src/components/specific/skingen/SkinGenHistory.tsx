@@ -11,8 +11,22 @@ import {
   Button,
 } from "@mui/material";
 import { DeleteRounded, VisibilityRounded, HistoryRounded } from "@mui/icons-material";
-import { type SkinGenHistoryItem } from "../../../hooks/useSkinGen";
-import { CONSTS } from "../../../config/consts";
+
+export type SkinGenHistoryStatus =
+  | "queued"
+  | "running"
+  | "done"
+  | "cancelled"
+  | "failed";
+
+export interface SkinGenHistoryItem {
+  taskId: string;
+  prompt: string;
+  status: SkinGenHistoryStatus;
+  createdAt: number;
+  finishedAt: number | null;
+  imageBase64: string | null;
+}
 
 type DisplayStatus =
   | "queued"
@@ -28,11 +42,13 @@ interface SkinGenHistoryProps {
   onView: (taskId: string) => void;
 }
 
+const TTL_SEC = 3600;
+
 const getDisplayStatus = (item: SkinGenHistoryItem): DisplayStatus => {
   if (item.status === "done") {
     const expired =
       item.finishedAt !== null &&
-      Date.now() / 1000 > item.finishedAt + CONSTS.SKIN_GEN.TTL_SEC;
+      Date.now() / 1000 > item.finishedAt + TTL_SEC;
     return expired ? "expired" : "done";
   }
   return item.status;
@@ -81,65 +97,63 @@ const SkinGenHistory: React.FC<SkinGenHistoryProps> = ({
             <Typography variant="body2">暂无生成记录</Typography>
           </Stack>
         ) : (
-        <Stack spacing={1} divider={<Divider flexItem />}>
-          {sortedHistory.map((item) => {
-            const displayStatus = getDisplayStatus(item);
-            const config = statusConfig[displayStatus];
-            const canView =
-              item.status === "queued" ||
-              item.status === "running" ||
-              (item.status === "done" && item.imageBase64 !== null);
+          <Stack spacing={1} divider={<Divider flexItem />}>
+            {sortedHistory.map((item) => {
+              const displayStatus = getDisplayStatus(item);
+              const config = statusConfig[displayStatus];
+              const canView =
+                item.status === "queued" ||
+                item.status === "running" ||
+                (item.status === "done" && item.imageBase64 !== null);
 
-            return (
-              <Box key={item.taskId}>
-                {/* 上行 */}
-                <Stack direction="row" alignItems="center" spacing={1}>
-                  <Typography variant="caption" color="text.secondary">
-                    {formatTime(item.createdAt)}
-                  </Typography>
-                  <Chip
-                    label={config.label}
-                    color={config.color}
-                    size="small"
-                    variant="filled"
-                  />
-                </Stack>
-                {/* 下行 */}
-                <Stack
-                  direction="row"
-                  alignItems="flex-start"
-                  spacing={1}
-                  sx={{ mt: 0.5 }}
-                >
-                  <Typography
-                    variant="body2"
-                    sx={{ flex: 1, wordBreak: "break-word" }}
-                  >
-                    {item.prompt}
-                  </Typography>
-                  <Stack direction="row" spacing={0.5} alignItems="center">
-                    <IconButton
+              return (
+                <Box key={item.taskId}>
+                  <Stack direction="row" alignItems="center" spacing={1}>
+                    <Typography variant="caption" color="text.secondary">
+                      {formatTime(item.createdAt)}
+                    </Typography>
+                    <Chip
+                      label={config.label}
+                      color={config.color}
                       size="small"
-                      onClick={() => onDelete(item.taskId)}
-                      title="删除记录"
-                    >
-                      <DeleteRounded fontSize="small" />
-                    </IconButton>
-                    <Button
-                      size="small"
-                      variant="outlined"
-                      startIcon={<VisibilityRounded fontSize="small" />}
-                      disabled={!canView}
-                      onClick={() => onView(item.taskId)}
-                    >
-                      查看
-                    </Button>
+                      variant="filled"
+                    />
                   </Stack>
-                </Stack>
-              </Box>
-            );
-          })}
-        </Stack>
+                  <Stack
+                    direction="row"
+                    alignItems="flex-start"
+                    spacing={1}
+                    sx={{ mt: 0.5 }}
+                  >
+                    <Typography
+                      variant="body2"
+                      sx={{ flex: 1, wordBreak: "break-word" }}
+                    >
+                      {item.prompt}
+                    </Typography>
+                    <Stack direction="row" spacing={0.5} alignItems="center">
+                      <IconButton
+                        size="small"
+                        onClick={() => onDelete(item.taskId)}
+                        title="删除记录"
+                      >
+                        <DeleteRounded fontSize="small" />
+                      </IconButton>
+                      <Button
+                        size="small"
+                        variant="outlined"
+                        startIcon={<VisibilityRounded fontSize="small" />}
+                        disabled={!canView}
+                        onClick={() => onView(item.taskId)}
+                      >
+                        查看
+                      </Button>
+                    </Stack>
+                  </Stack>
+                </Box>
+              );
+            })}
+          </Stack>
         )}
       </CardContent>
     </Card>

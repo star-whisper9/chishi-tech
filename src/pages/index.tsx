@@ -75,10 +75,10 @@ export const pages: Page[] = [
     shit: false,
   },
   {
-    title: "AI 画皮肤(Demo)",
+    title: "AI 画皮肤(已下线)",
     icon: <AutoAwesomeRounded color="primary" fontSize="large" />,
     description: "输入提示词，AI 为你生成 Minecraft 皮肤。",
-    lastUpdated: "2026-5-28",
+    lastUpdated: "2026-6-15",
     link: "/skingen",
     shit: false,
   },

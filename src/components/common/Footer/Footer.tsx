@@ -22,8 +22,11 @@ const Footer: React.FC = () => {
     <Box
       component="footer"
       sx={{
-        py: 3,
+        pt: { xs: 3, md: 4 },
+        pb: { xs: 2, md: 3 },
         mt: "auto",
+        borderTop: "1px solid",
+        borderColor: "divider",
       }}
     >
       <Box display="flex" justifyContent="center" sx={{ mb: 2 }}>

@@ -20,7 +20,7 @@ const RootLayout: React.FC<RootLayoutProps> = ({
   return (
     <>
       <TitleManager title={title} titleSuffix={titleSuffix} />
-      <DevWatermark />
+      {import.meta.env.DEV && <DevWatermark />}
       {children}
     </>
   );

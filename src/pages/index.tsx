@@ -19,6 +19,7 @@ export type Page = {
   lastUpdated: string;
   link: string;
   shit?: boolean; // false 显示「精选」；true 显示「赤石」；不填则不显示
+  status?: "active" | "offline";
 };
 
 export const pages: Page[] = [
@@ -75,11 +76,12 @@ export const pages: Page[] = [
     shit: false,
   },
   {
-    title: "AI 画皮肤(已下线)",
+    title: "AI 画皮肤",
     icon: <AIGeneraionImage color="primary" fontSize="large" />,
     description: "输入提示词，AI 为你生成 Minecraft 皮肤。",
     lastUpdated: "2026-6-15",
     link: "/skingen",
     shit: false,
+    status: "offline",
   },
 ];

@@ -10,7 +10,11 @@ import {
 } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import type { Page } from "../../../pages";
-import { AutoAwesomeRounded } from "@mui/icons-material";
+import {
+  ArrowForwardRounded,
+  AutoAwesomeRounded,
+  CalendarTodayRounded,
+} from "@mui/icons-material";
 import Poop from "../Icons/Poop";
 
 interface PageCardProps {
@@ -19,6 +23,7 @@ interface PageCardProps {
 
 const PageCard: React.FC<PageCardProps> = ({ page }) => {
   const navigate = useNavigate();
+  const isOffline = page.status === "offline";
 
   return (
     <Card
@@ -28,14 +33,45 @@ const PageCard: React.FC<PageCardProps> = ({ page }) => {
         display: "flex",
         flexDirection: "column",
         position: "relative",
+        borderRadius: 3,
+        transition: (theme) =>
+          theme.transitions.create(
+            ["border-color", "box-shadow", "transform"],
+            { duration: theme.transitions.duration.short },
+          ),
+        "&:hover": {
+          borderColor: "primary.main",
+          boxShadow: 3,
+          transform: "translateY(-3px)",
+        },
+        "&:focus-within": {
+          borderColor: "primary.main",
+          boxShadow: 2,
+        },
       }}
     >
       <CardActionArea
         onClick={() => navigate(page.link)}
-        sx={{ flexGrow: 1, alignItems: "stretch" }}
+        sx={{
+          flexGrow: 1,
+          alignItems: "stretch",
+          display: "flex",
+          flexDirection: "column",
+          "&:hover .page-card-arrow": {
+            color: "primary.main",
+            transform: "translateX(4px)",
+          },
+        }}
       >
-        <CardContent>
-          <Stack spacing={1.5}>
+        <CardContent
+          sx={{
+            width: "100%",
+            flexGrow: 1,
+            p: { xs: 2.25, sm: 3 },
+            "&:last-child": { pb: { xs: 2.25, sm: 3 } },
+          }}
+        >
+          <Stack spacing={1.75} sx={{ height: "100%" }}>
             {/* 头部：图标 + 标题 + 标签 */}
             <Box display="flex" alignItems="center" gap={1.5}>
               {/* 大图标 Box */}
@@ -48,11 +84,8 @@ const PageCard: React.FC<PageCardProps> = ({ page }) => {
                     alignItems: "center",
                     justifyContent: "center",
                     flexShrink: 0,
-                    borderRadius: 1.5,
-                    bgcolor: (theme) =>
-                      theme.palette.mode === "light"
-                        ? "primary.50"
-                        : "primary.900",
+                    borderRadius: 2,
+                    bgcolor: "action.hover",
                     color: "primary.main",
                     "& svg": { fontSize: 24 },
                     "& img": { width: 24, height: 24, objectFit: "contain" },
@@ -74,17 +107,27 @@ const PageCard: React.FC<PageCardProps> = ({ page }) => {
                     variant="h6"
                     component="h3"
                     sx={{
-                      fontWeight: 600,
-                      // 1. 修复大图标与标题未对齐：将 1.2 改为 1.4 或 normal，让文字包围盒更饱满
-                      lineHeight: 1.4,
-                      // 2. 视觉微调：将中文字往下压 1px（或者根据你的字体微调）
-                      transform: "translateY(1px)",
+                      fontWeight: 700,
+                      lineHeight: 1.3,
                     }}
                   >
                     {page.title}
                   </Typography>
 
-                  {page.shit === false && (
+                  {isOffline && (
+                    <Chip
+                      label="已下线"
+                      size="small"
+                      variant="outlined"
+                      sx={{
+                        height: 22,
+                        fontSize: "0.75rem",
+                        fontWeight: 600,
+                      }}
+                    />
+                  )}
+
+                  {!isOffline && page.shit === false && (
                     <Chip
                       label="精选"
                       size="small"
@@ -143,13 +186,36 @@ const PageCard: React.FC<PageCardProps> = ({ page }) => {
             <Typography
               variant="body2"
               color="text.secondary"
-              sx={{ flexGrow: 1 }}
+              sx={{ flexGrow: 1, lineHeight: 1.65 }}
             >
               {page.description}
             </Typography>
-            <Typography variant="caption" color="text.secondary">
-              更新: {page.lastUpdated}
-            </Typography>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: 1,
+                mt: 0.5,
+              }}
+            >
+              <Stack direction="row" spacing={0.75} alignItems="center">
+                <CalendarTodayRounded
+                  sx={{ fontSize: 15, color: "text.disabled" }}
+                />
+                <Typography variant="caption" color="text.secondary">
+                  更新 {page.lastUpdated}
+                </Typography>
+              </Stack>
+              <ArrowForwardRounded
+                className="page-card-arrow"
+                sx={{
+                  fontSize: 20,
+                  color: "text.disabled",
+                  transition: "transform 160ms ease, color 160ms ease",
+                }}
+              />
+            </Box>
           </Stack>
         </CardContent>
       </CardActionArea>

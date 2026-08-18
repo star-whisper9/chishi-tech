@@ -1,5 +1,6 @@
 import React from "react";
 import { Box, Container, type Breakpoint } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import Header from "../common/Header";
 import Footer from "../common/Footer/Footer";
 import BackToTop from "../common/BackToTop";
@@ -25,6 +26,17 @@ const MainLayout: React.FC<MainLayoutProps> = ({
           minHeight: "100vh",
           display: "flex",
           flexDirection: "column",
+          backgroundColor: "background.default",
+          backgroundImage: (theme) =>
+            `radial-gradient(circle at 10% 0%, ${alpha(
+              theme.palette.primary.main,
+              theme.palette.mode === "light" ? 0.08 : 0.12,
+            )} 0, transparent 28rem), radial-gradient(circle, ${alpha(
+              theme.palette.primary.main,
+              theme.palette.mode === "light" ? 0.1 : 0.08,
+            )} 1px, transparent 1px)`,
+          backgroundSize: "100% 100%, 24px 24px",
+          backgroundPosition: "0 0, 0 0",
         }}
       >
         <Header />

@@ -17,6 +17,7 @@ import {
   ToggleButton,
   Typography,
 } from "@mui/material";
+import { alpha } from "@mui/material/styles";
 import type { SelectChangeEvent } from "@mui/material";
 import useCollage, {
   type CollageCell,
@@ -675,7 +676,16 @@ const CollageMaker: React.FC = () => {
                       alignItems: "center",
                       justifyContent: "center",
                       borderRadius: 2,
-                      bgcolor: "background.default",
+                      bgcolor: "background.paper",
+                      backgroundImage: (theme) => {
+                        const square = alpha(
+                          theme.palette.text.primary,
+                          theme.palette.mode === "light" ? 0.05 : 0.1,
+                        );
+                        return `linear-gradient(45deg, ${square} 25%, transparent 25%), linear-gradient(-45deg, ${square} 25%, transparent 25%), linear-gradient(45deg, transparent 75%, ${square} 75%), linear-gradient(-45deg, transparent 75%, ${square} 75%)`;
+                      },
+                      backgroundSize: "24px 24px",
+                      backgroundPosition: "0 0, 0 12px, 12px -12px, -12px 0",
                       pointerEvents: "none",
                     }}
                   >

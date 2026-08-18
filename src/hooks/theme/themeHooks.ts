@@ -9,6 +9,10 @@ const darkHCPalette: ThemeOptions = {
     secondary: {
       main: "#ccdfef",
     },
+    background: {
+      default: "#080f15",
+      paper: "#101c26",
+    },
   },
 };
 
@@ -20,6 +24,10 @@ const lightHCPalette: ThemeOptions = {
     },
     secondary: {
       main: "#1d2e3a",
+    },
+    background: {
+      default: "#ffffff",
+      paper: "#ffffff",
     },
   },
 };
@@ -33,6 +41,10 @@ const darkPalette: ThemeOptions = {
     secondary: {
       main: "#b7c9d8",
     },
+    background: {
+      default: "#101a22",
+      paper: "#17242e",
+    },
   },
 };
 
@@ -44,6 +56,10 @@ const lightPalette: ThemeOptions = {
     },
     secondary: {
       main: "#4f616e",
+    },
+    background: {
+      default: "#f3f7fa",
+      paper: "#ffffff",
     },
   },
 };

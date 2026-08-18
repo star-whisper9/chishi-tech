@@ -9,6 +9,43 @@ interface PageIntroProps {
 const PageIntro = ({ title, description }: PageIntroProps) => {
   return (
     <Box sx={{ px: 1, textAlign: "center" }}>
+      <Box
+        aria-hidden
+        sx={{
+          display: "inline-flex",
+          alignItems: "center",
+          gap: 0.75,
+          mb: 1.75,
+          color: "primary.main",
+          opacity: 0.8,
+        }}
+      >
+        <Box
+          sx={{
+            width: { xs: 24, sm: 36 },
+            height: 2,
+            borderRadius: 1,
+            bgcolor: "currentColor",
+          }}
+        />
+        <Box
+          sx={{
+            width: 7,
+            height: 7,
+            borderRadius: "2px",
+            bgcolor: "secondary.main",
+            transform: "rotate(45deg)",
+          }}
+        />
+        <Box
+          sx={{
+            width: { xs: 24, sm: 36 },
+            height: 2,
+            borderRadius: 1,
+            bgcolor: "currentColor",
+          }}
+        />
+      </Box>
       <Typography
         component="h1"
         variant="h3"

@@ -33,6 +33,7 @@ import {
   NotificationsNone,
 } from "@mui/icons-material";
 import MainLayout from "../components/layout/MainLayout";
+import PageIntro from "../components/common/PageIntro";
 
 function ExamplePage() {
   const [count, setCount] = useState(0);
@@ -54,18 +55,14 @@ function ExamplePage() {
 
   return (
     <MainLayout>
-      <Box sx={{ py: 4 }}>
-        {/* 标题区域 */}
-        <Box sx={{ textAlign: "center", mb: 6 }}>
-          <Typography variant="h2" component="h1" gutterBottom>
-            MUI 组件演示
-          </Typography>
-          <Typography variant="h6" color="text.secondary" gutterBottom>
-            探索 Material-UI 的常用组件
-          </Typography>
-        </Box>
+      <Box sx={{ py: { xs: 3, md: 4 } }}>
+        <Stack spacing={{ xs: 3, md: 4 }}>
+          <PageIntro
+            title="MUI 组件演示"
+            description="探索 Material-UI 的常用组件"
+          />
 
-        <Grid container spacing={4}>
+          <Grid container spacing={4}>
           {/* 按钮组件演示 */}
           <Grid size={{ xs: 12, md: 6 }}>
             <Card>
@@ -349,7 +346,8 @@ function ExamplePage() {
               </CardContent>
             </Card>
           </Grid>
-        </Grid>
+          </Grid>
+        </Stack>
 
         {/* 通知栏 */}
         <Snackbar

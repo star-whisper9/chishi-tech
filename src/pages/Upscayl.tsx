@@ -1,6 +1,7 @@
 import React from "react";
-import { Box, Typography, Stack } from "@mui/material";
+import { Box, Stack } from "@mui/material";
 import MainLayout from "../components/layout/MainLayout";
+import PageIntro from "../components/common/PageIntro";
 import Upscayl from "../components/specific/upscayl/Upscayl";
 import { pages } from "./index";
 
@@ -18,16 +19,9 @@ const UpscaylPage: React.FC = () => {
 
   return (
     <MainLayout>
-      <Box sx={{ py: 6 }}>
-        <Stack spacing={4} alignItems="center">
-          <Box textAlign="center">
-            <Typography variant="h3" gutterBottom>
-              {title}
-            </Typography>
-            <Typography variant="h6" color="text.secondary">
-              {description}
-            </Typography>
-          </Box>
+      <Box sx={{ py: { xs: 3, md: 4 } }}>
+        <Stack spacing={{ xs: 3, md: 4 }} alignItems="center">
+          <PageIntro title={title} description={description} />
           <Upscayl />
         </Stack>
       </Box>

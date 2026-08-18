@@ -7,6 +7,7 @@ import {
   Divider,
   FormControl,
   FormControlLabel,
+  Grid,
   InputLabel,
   MenuItem,
   Select,
@@ -61,8 +62,6 @@ const CollageMaker: React.FC = () => {
     setFitMode,
     showLines,
     setShowLines,
-    outputFormat,
-    setOutputFormat,
     jpegQuality,
     setJpegQuality,
     addImages,
@@ -296,9 +295,8 @@ const CollageMaker: React.FC = () => {
   );
 
   const handleExport = useCallback(
-    async (formatOverride?: CollageOutputFormat) => {
-      const blob = await exportImage(formatOverride, autoCells);
-      const format = formatOverride ?? outputFormat;
+    async (format: CollageOutputFormat) => {
+      const blob = await exportImage(format, autoCells);
       const url = URL.createObjectURL(blob);
       const link = document.createElement("a");
       link.href = url;
@@ -306,7 +304,7 @@ const CollageMaker: React.FC = () => {
       link.click();
       URL.revokeObjectURL(url);
     },
-    [exportImage, outputFormat, autoCells],
+    [exportImage, autoCells],
   );
 
   const handleLayoutChange = useCallback(
@@ -323,266 +321,323 @@ const CollageMaker: React.FC = () => {
     [setFitMode],
   );
 
-  const handleFormatChange = useCallback(
-    (event: SelectChangeEvent<string>) => {
-      setOutputFormat(event.target.value as CollageOutputFormat);
-    },
-    [setOutputFormat],
-  );
-
   return (
     <Stack spacing={3} alignItems="stretch">
       <Card variant="outlined">
-        <CardContent>
+        <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
           <Stack spacing={3}>
-            <Stack direction={{ xs: "column", md: "row" }} spacing={2}>
-              <Button variant="contained" component="label">
-                上传图片 (最多 16 张)
-                <input
-                  hidden
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleFiles}
-                />
-              </Button>
-              <Button
-                variant="text"
-                color="inherit"
-                disabled={images.length === 0}
-                onClick={clearImages}
+            <Box>
+              <Stack
+                direction={{ xs: "column", sm: "row" }}
+                spacing={2}
+                alignItems={{ xs: "stretch", sm: "center" }}
+                justifyContent="space-between"
               >
-                清空
-              </Button>
-            </Stack>
+                <Box>
+                  <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                    图片
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    最多选择 16 张，拖动缩略图可以调整顺序。
+                  </Typography>
+                </Box>
+                <Stack direction="row" spacing={1}>
+                  <Button variant="contained" component="label">
+                    选择图片
+                    <input
+                      hidden
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleFiles}
+                    />
+                  </Button>
+                  <Button
+                    variant="text"
+                    color="inherit"
+                    disabled={images.length === 0}
+                    onClick={clearImages}
+                  >
+                    清空
+                  </Button>
+                </Stack>
+              </Stack>
 
-            <Stack spacing={2}>
-              {images.length === 0 ? (
-                <Typography variant="body2" color="text.secondary">
-                  还没有图片，先上传几张。
-                </Typography>
-              ) : (
-                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                  {images.map((img) => (
-                    <Box
-                      key={img.id}
-                      draggable
-                      onDragStart={() => setDraggingId(img.id)}
-                      onDragEnd={() => setDraggingId(null)}
-                      onDragOver={(event) => event.preventDefault()}
-                      onDrop={() => {
-                        if (!draggingId || draggingId === img.id) return;
-                        moveImage(draggingId, img.id);
-                        setDraggingId(null);
-                      }}
-                      sx={{
-                        width: 84,
-                        height: 84,
-                        borderRadius: 1,
-                        overflow: "hidden",
-                        position: "relative",
-                        border: "1px solid",
-                        borderColor:
-                          draggingId === img.id ? "primary.main" : "divider",
-                        boxShadow: draggingId === img.id ? 2 : 0,
-                        cursor: "grab",
-                      }}
-                    >
+              <Box sx={{ mt: 2 }}>
+                {images.length === 0 ? (
+                  <Box
+                    sx={{
+                      border: "1px dashed",
+                      borderColor: "divider",
+                      borderRadius: 2,
+                      p: { xs: 2.5, sm: 3 },
+                      textAlign: "center",
+                      bgcolor: "action.hover",
+                    }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      还没有图片
+                    </Typography>
+                    <Typography variant="caption" color="text.disabled">
+                      选择后会在这里显示缩略图
+                    </Typography>
+                  </Box>
+                ) : (
+                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                    {images.map((img) => (
                       <Box
-                        component="img"
-                        src={img.url}
-                        alt={img.file.name}
-                        sx={{
-                          width: "100%",
-                          height: "100%",
-                          objectFit: "cover",
+                        key={img.id}
+                        draggable
+                        onDragStart={() => setDraggingId(img.id)}
+                        onDragEnd={() => setDraggingId(null)}
+                        onDragOver={(event) => event.preventDefault()}
+                        onDrop={() => {
+                          if (!draggingId || draggingId === img.id) return;
+                          moveImage(draggingId, img.id);
+                          setDraggingId(null);
                         }}
-                      />
-                      <Button
-                        size="small"
-                        onClick={() => removeImage(img.id)}
                         sx={{
-                          position: "absolute",
-                          top: 2,
-                          right: 2,
-                          minWidth: 0,
-                          padding: "2px 6px",
-                          bgcolor: "rgba(0,0,0,0.55)",
-                          color: "#fff",
-                          fontSize: 11,
-                          lineHeight: 1,
-                          "&:hover": { bgcolor: "rgba(0,0,0,0.7)" },
+                          width: 84,
+                          height: 84,
+                          borderRadius: 1,
+                          overflow: "hidden",
+                          position: "relative",
+                          border: "1px solid",
+                          borderColor:
+                            draggingId === img.id ? "primary.main" : "divider",
+                          boxShadow: draggingId === img.id ? 2 : 0,
+                          cursor: "grab",
                         }}
                       >
-                        X
-                      </Button>
-                    </Box>
-                  ))}
-                </Stack>
-              )}
-            </Stack>
+                        <Box
+                          component="img"
+                          src={img.url}
+                          alt={img.file.name}
+                          sx={{
+                            width: "100%",
+                            height: "100%",
+                            objectFit: "cover",
+                          }}
+                        />
+                        <Button
+                          size="small"
+                          onClick={() => removeImage(img.id)}
+                          sx={{
+                            position: "absolute",
+                            top: 2,
+                            right: 2,
+                            minWidth: 0,
+                            padding: "2px 6px",
+                            bgcolor: "rgba(0,0,0,0.55)",
+                            color: "#fff",
+                            fontSize: 11,
+                            lineHeight: 1,
+                            "&:hover": { bgcolor: "rgba(0,0,0,0.7)" },
+                          }}
+                        >
+                          X
+                        </Button>
+                      </Box>
+                    ))}
+                  </Stack>
+                )}
+              </Box>
+            </Box>
 
             <Divider />
 
-            <Stack spacing={2}>
-              <FormControl fullWidth size="small">
-                <InputLabel id="collage-layout-label">布局</InputLabel>
-                <Select
-                  labelId="collage-layout-label"
-                  label="布局"
-                  value={layoutId}
-                  onChange={handleLayoutChange}
-                >
-                  {layouts.map((layout) => {
-                    const capacity = layout.maxCells ?? layout.cells.length;
-                    const disabled = images.length > capacity;
-                    return (
-                      <MenuItem
-                        key={layout.id}
-                        value={layout.id}
-                        disabled={disabled}
+            <Box>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                画布与布局
+              </Typography>
+              <Stack spacing={3} sx={{ mt: 2.5 }}>
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                    布局与尺寸
+                  </Typography>
+                  <Grid container spacing={2} sx={{ mt: 0.5 }}>
+                    <Grid size={{ xs: 12 }}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel id="collage-layout-label">布局</InputLabel>
+                        <Select
+                          labelId="collage-layout-label"
+                          label="布局"
+                          value={layoutId}
+                          onChange={handleLayoutChange}
+                        >
+                          {layouts.map((layout) => {
+                            const capacity =
+                              layout.maxCells ?? layout.cells.length;
+                            const disabled = images.length > capacity;
+                            return (
+                              <MenuItem
+                                key={layout.id}
+                                value={layout.id}
+                                disabled={disabled}
+                              >
+                                {getLayoutLabel(layout.id)}
+                              </MenuItem>
+                            );
+                          })}
+                        </Select>
+                      </FormControl>
+                    </Grid>
+
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TextField
+                        label="宽度"
+                        type="number"
+                        value={outputWidth}
+                        disabled={autoSizeEnabled}
+                        onChange={(event) => {
+                          const next = Number(event.target.value);
+                          setOutputWidth(Number.isFinite(next) ? next : 0);
+                        }}
+                        size="small"
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 6 }}>
+                      <TextField
+                        label="高度"
+                        type="number"
+                        value={outputHeight}
+                        disabled={autoSizeEnabled}
+                        onChange={(event) => {
+                          const next = Number(event.target.value);
+                          setOutputHeight(Number.isFinite(next) ? next : 0);
+                        }}
+                        size="small"
+                        fullWidth
+                      />
+                    </Grid>
+
+                    <Grid size={{ xs: 12 }}>
+                      <Stack
+                        direction="row"
+                        spacing={1}
+                        flexWrap="wrap"
+                        useFlexGap
                       >
-                        {getLayoutLabel(layout.id)}
-                      </MenuItem>
-                    );
-                  })}
-                </Select>
-              </FormControl>
+                        <ToggleButton
+                          value="auto-size"
+                          selected={autoSizeEnabled}
+                          onChange={() => setAutoSizeEnabled((prev) => !prev)}
+                          size="small"
+                        >
+                          Auto
+                        </ToggleButton>
+                        {PRESET_SIZES.map((preset) => (
+                          <Button
+                            key={preset.label}
+                            size="small"
+                            variant="outlined"
+                            disabled={autoSizeEnabled}
+                            onClick={() => {
+                              setOutputWidth(preset.width);
+                              setOutputHeight(preset.height);
+                            }}
+                          >
+                            {preset.label}
+                          </Button>
+                        ))}
+                      </Stack>
+                    </Grid>
+                  </Grid>
+                </Box>
 
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-                <TextField
-                  label="宽度"
-                  type="number"
-                  value={outputWidth}
-                  disabled={autoSizeEnabled}
-                  onChange={(event) => {
-                    const next = Number(event.target.value);
-                    setOutputWidth(Number.isFinite(next) ? next : 0);
-                  }}
-                  size="small"
-                  fullWidth
-                />
-                <TextField
-                  label="高度"
-                  type="number"
-                  value={outputHeight}
-                  disabled={autoSizeEnabled}
-                  onChange={(event) => {
-                    const next = Number(event.target.value);
-                    setOutputHeight(Number.isFinite(next) ? next : 0);
-                  }}
-                  size="small"
-                  fullWidth
-                />
-              </Stack>
+                <Divider />
 
-              <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                <ToggleButton
-                  value="auto-size"
-                  selected={autoSizeEnabled}
-                  onChange={() => setAutoSizeEnabled((prev) => !prev)}
-                  size="small"
+                <Box>
+                  <Typography variant="subtitle2" sx={{ fontWeight: 700 }}>
+                    填充与间隔
+                  </Typography>
+                  <Grid container spacing={2} sx={{ mt: 0.5 }}>
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                      <FormControl fullWidth size="small">
+                        <InputLabel id="collage-fit-label">填充</InputLabel>
+                        <Select
+                          labelId="collage-fit-label"
+                          label="填充"
+                          value={fitMode}
+                          onChange={handleFitModeChange}
+                        >
+                          <MenuItem value="contain">Contain</MenuItem>
+                          <MenuItem value="cover">Cover</MenuItem>
+                          <MenuItem value="center">Center</MenuItem>
+                          <MenuItem value="stretch">Stretch</MenuItem>
+                        </Select>
+                      </FormControl>
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                      <TextField
+                        label="间隔"
+                        type="number"
+                        value={gap}
+                        onChange={(event) =>
+                          setGap(Math.max(0, Number(event.target.value)))
+                        }
+                        size="small"
+                        fullWidth
+                      />
+                    </Grid>
+                    <Grid size={{ xs: 12, sm: 4 }}>
+                      <TextField
+                        label="间隔颜色"
+                        type="color"
+                        value={gapColor}
+                        onChange={(event) => setGapColor(event.target.value)}
+                        size="small"
+                        fullWidth
+                        InputLabelProps={{ shrink: true }}
+                      />
+                    </Grid>
+                  </Grid>
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexDirection: { xs: "column", sm: "row" },
+                    alignItems: { xs: "flex-start", sm: "center" },
+                    gap: 1,
+                    p: 1.5,
+                    borderRadius: 2,
+                    bgcolor: "action.hover",
+                  }}
                 >
-                  Auto
-                </ToggleButton>
-                {PRESET_SIZES.map((preset) => (
-                  <Button
-                    key={preset.label}
-                    size="small"
-                    variant="outlined"
-                    disabled={autoSizeEnabled}
-                    onClick={() => {
-                      setOutputWidth(preset.width);
-                      setOutputHeight(preset.height);
-                    }}
-                  >
-                    {preset.label}
-                  </Button>
-                ))}
-              </Stack>
-
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-                <FormControl fullWidth size="small">
-                  <InputLabel id="collage-fit-label">填充</InputLabel>
-                  <Select
-                    labelId="collage-fit-label"
-                    label="填充"
-                    value={fitMode}
-                    onChange={handleFitModeChange}
-                  >
-                    <MenuItem value="contain">Contain</MenuItem>
-                    <MenuItem value="cover">Cover</MenuItem>
-                    <MenuItem value="center">Center</MenuItem>
-                    <MenuItem value="stretch">Stretch</MenuItem>
-                  </Select>
-                </FormControl>
-                <TextField
-                  label="间隔"
-                  type="number"
-                  value={gap}
-                  onChange={(event) =>
-                    setGap(Math.max(0, Number(event.target.value)))
-                  }
-                  size="small"
-                  fullWidth
-                />
-                <TextField
-                  label="间隔颜色"
-                  type="color"
-                  value={gapColor}
-                  onChange={(event) => setGapColor(event.target.value)}
-                  size="small"
-                  fullWidth
-                  InputLabelProps={{ shrink: true }}
-                />
-              </Stack>
-
-              <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-                <FormControlLabel
-                  control={
-                    <Switch
-                      checked={showLines}
-                      onChange={(event) => setShowLines(event.target.checked)}
-                    />
-                  }
-                  label="显示线条"
-                />
-                <FormControl fullWidth size="small">
-                  <InputLabel id="collage-format-label">导出格式</InputLabel>
-                  <Select
-                    labelId="collage-format-label"
-                    label="导出格式"
-                    value={outputFormat}
-                    onChange={handleFormatChange}
-                  >
-                    <MenuItem value="png">PNG</MenuItem>
-                    <MenuItem value="jpeg">JPEG</MenuItem>
-                  </Select>
-                </FormControl>
-                {outputFormat === "jpeg" && (
-                  <TextField
-                    label="JPEG 质量"
-                    type="number"
-                    value={jpegQuality}
-                    onChange={(event) =>
-                      setJpegQuality(
-                        Math.min(1, Math.max(0.5, Number(event.target.value))),
-                      )
+                  <FormControlLabel
+                    sx={{ m: 0 }}
+                    control={
+                      <Switch
+                        checked={showLines}
+                        onChange={(event) => setShowLines(event.target.checked)}
+                      />
                     }
-                    size="small"
-                    fullWidth
-                    inputProps={{ step: 0.05, min: 0.5, max: 1 }}
+                    label="添加描边"
                   />
-                )}
+                  <Typography variant="caption" color="text.secondary">
+                    为每张图片绘制边框
+                  </Typography>
+                </Box>
               </Stack>
-            </Stack>
+            </Box>
           </Stack>
         </CardContent>
       </Card>
 
       <Card variant="outlined">
-        <CardContent>
-          <Stack spacing={2} alignItems="center">
+        <CardContent sx={{ p: { xs: 2, sm: 3 } }}>
+          <Stack spacing={2.5} alignItems="center">
+            <Box sx={{ width: "100%" }}>
+              <Typography variant="subtitle1" sx={{ fontWeight: 700 }}>
+                预览
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                选择图片后，这里会显示最终拼图效果。
+              </Typography>
+            </Box>
+
             <Box
               sx={{
                 width: "100%",
@@ -591,33 +646,83 @@ const CollageMaker: React.FC = () => {
               }}
             >
               <Box
-                component="canvas"
-                ref={canvasRef}
                 sx={{
                   width: "100%",
                   maxWidth: previewSize.width,
-                  borderRadius: 2,
-                  border: "1px solid",
-                  borderColor: "divider",
-                  bgcolor: "background.default",
+                  position: "relative",
+                  aspectRatio: `${previewSize.width} / ${previewSize.height}`,
                 }}
-              />
+              >
+                <Box
+                  component="canvas"
+                  ref={canvasRef}
+                  sx={{
+                    display: "block",
+                    width: "100%",
+                    height: "100%",
+                    borderRadius: 2,
+                    border: "1px solid",
+                    borderColor: "divider",
+                    bgcolor: "background.default",
+                  }}
+                />
+                {images.length === 0 && (
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      inset: 0,
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      borderRadius: 2,
+                      bgcolor: "background.default",
+                      pointerEvents: "none",
+                    }}
+                  >
+                    <Typography variant="body2" color="text.secondary">
+                      暂无预览
+                    </Typography>
+                  </Box>
+                )}
+              </Box>
             </Box>
-            <Stack direction={{ xs: "column", sm: "row" }} spacing={2}>
-              <Button
-                variant="contained"
-                disabled={images.length === 0}
-                onClick={() => handleExport("png")}
-              >
-                导出 PNG
-              </Button>
-              <Button
-                variant="outlined"
-                disabled={images.length === 0}
-                onClick={() => handleExport("jpeg")}
-              >
-                导出 JPEG
-              </Button>
+
+            <Stack
+              direction={{ xs: "column", sm: "row" }}
+              spacing={2}
+              alignItems={{ xs: "stretch", sm: "center" }}
+              justifyContent="center"
+              sx={{ width: "100%" }}
+            >
+              <TextField
+                label="JPEG 质量"
+                type="number"
+                value={jpegQuality}
+                onChange={(event) =>
+                  setJpegQuality(
+                    Math.min(1, Math.max(0.5, Number(event.target.value))),
+                  )
+                }
+                size="small"
+                inputProps={{ step: 0.05, min: 0.5, max: 1 }}
+                sx={{ width: { xs: "100%", sm: 160 } }}
+              />
+              <Stack direction="row" spacing={2} justifyContent="center">
+                <Button
+                  variant="contained"
+                  disabled={images.length === 0}
+                  onClick={() => handleExport("png")}
+                >
+                  导出 PNG
+                </Button>
+                <Button
+                  variant="outlined"
+                  disabled={images.length === 0}
+                  onClick={() => handleExport("jpeg")}
+                >
+                  导出 JPEG
+                </Button>
+              </Stack>
             </Stack>
           </Stack>
         </CardContent>

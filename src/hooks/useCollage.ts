@@ -158,8 +158,6 @@ export interface UseCollageReturn {
   setFitMode: (value: CollageFitMode) => void;
   showLines: boolean;
   setShowLines: (value: boolean) => void;
-  outputFormat: CollageOutputFormat;
-  setOutputFormat: (value: CollageOutputFormat) => void;
   jpegQuality: number;
   setJpegQuality: (value: number) => void;
   addImages: (files: FileList | File[]) => Promise<void>;
@@ -188,7 +186,6 @@ export function useCollage(): UseCollageReturn {
   const [gapColor, setGapColor] = useState("#f5f5f5");
   const [fitMode, setFitMode] = useState<CollageFitMode>("contain");
   const [showLines, setShowLines] = useState(false);
-  const [outputFormat, setOutputFormat] = useState<CollageOutputFormat>("png");
   const [jpegQuality, setJpegQuality] = useState(0.92);
 
   useEffect(() => {
@@ -397,7 +394,7 @@ export function useCollage(): UseCollageReturn {
       formatOverride?: CollageOutputFormat,
       cellsOverride?: CollageCell[],
     ) => {
-      const format = formatOverride ?? outputFormat;
+      const format = formatOverride ?? "png";
       const canvas = document.createElement("canvas");
       canvas.width = clamp(outputWidth, 64, MAX_OUTPUT_SIZE);
       canvas.height = clamp(outputHeight, 64, MAX_OUTPUT_SIZE);
@@ -421,7 +418,7 @@ export function useCollage(): UseCollageReturn {
 
       return blob;
     },
-    [jpegQuality, outputFormat, outputHeight, outputWidth, renderToCanvas],
+    [jpegQuality, outputHeight, outputWidth, renderToCanvas],
   );
 
   return {
@@ -441,8 +438,6 @@ export function useCollage(): UseCollageReturn {
     setFitMode,
     showLines,
     setShowLines,
-    outputFormat,
-    setOutputFormat,
     jpegQuality,
     setJpegQuality,
     addImages,

@@ -29,8 +29,20 @@ const ThemeSwitcher: React.FC = () => {
       <Button
         variant="outlined"
         color="inherit"
+        size="small"
         onClick={handleClick}
         endIcon={<ExpandMoreIcon />}
+        sx={{
+          minWidth: 0,
+          borderRadius: 2,
+          px: { xs: 1.25, sm: 1.5 },
+          fontWeight: 600,
+          borderColor: "currentColor",
+          "&:hover": {
+            borderColor: "currentColor",
+            bgcolor: "action.hover",
+          },
+        }}
       >
         {themeNameMap[currentTheme]}
       </Button>

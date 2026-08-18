@@ -36,6 +36,11 @@ const navItems: NavItem[] = [
   { label: "API", path: "/api", icon: <ApiIcon /> },
 ];
 
+const isNavItemActive = (pathname: string, path: string) =>
+  path === "/"
+    ? pathname === "/"
+    : pathname === path || pathname.startsWith(`${path}/`);
+
 const Header: React.FC = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -98,7 +103,7 @@ const Header: React.FC = () => {
           <ListItem key={item.path} disablePadding>
             <ListItemButton
               onClick={() => handleNavigation(item.path)}
-              selected={location.pathname === item.path}
+              selected={isNavItemActive(location.pathname, item.path)}
               sx={{
                 mx: 1,
                 borderRadius: 2,
@@ -136,8 +141,17 @@ const Header: React.FC = () => {
 
   return (
     <>
-      <AppBar position="sticky">
-        <Toolbar>
+      <AppBar
+        position="sticky"
+        elevation={0}
+        sx={{ borderBottom: "1px solid", borderColor: "divider" }}
+      >
+        <Toolbar
+          sx={{
+            minHeight: { xs: 64, md: 72 },
+            px: { xs: 2, sm: 3 },
+          }}
+        >
           {/* 移动端：菜单按钮 */}
           {isMobile && (
             <IconButton
@@ -191,27 +205,63 @@ const Header: React.FC = () => {
                   >
                     <ArrowBackIcon />
                   </IconButton>
-                  {navItems.map((item) => (
-                    <RouterLink
-                      key={item.path}
-                      to={item.path}
-                      style={{ textDecoration: "none", color: "inherit" }}
-                    >
-                      <Typography
-                        component="span"
-                        sx={{
-                          opacity: location.pathname === item.path ? 1 : 0.8,
-                          fontWeight:
-                            location.pathname === item.path ? 600 : 400,
-                          "&:hover": {
-                            opacity: 1,
-                          },
+                  {navItems.map((item) => {
+                    const isActive = isNavItemActive(
+                      location.pathname,
+                      item.path,
+                    );
+                    return (
+                      <RouterLink
+                        key={item.path}
+                        to={item.path}
+                        style={{
+                          textDecoration: "none",
+                          color: "inherit",
                         }}
                       >
-                        {item.label}
-                      </Typography>
-                    </RouterLink>
-                  ))}
+                        <Box
+                          component="span"
+                          sx={{
+                            position: "relative",
+                            display: "inline-flex",
+                            alignItems: "center",
+                            px: 1.25,
+                            py: 0.75,
+                            borderRadius: 2,
+                            bgcolor: isActive
+                              ? "rgba(255,255,255,0.14)"
+                              : "transparent",
+                            transition: "background-color 160ms ease",
+                            "&::after": {
+                              content: '""',
+                              position: "absolute",
+                              left: "20%",
+                              right: "20%",
+                              bottom: 3,
+                              height: 2,
+                              borderRadius: 1,
+                              bgcolor: "currentColor",
+                              transform: isActive ? "scaleX(1)" : "scaleX(0)",
+                              transition: "transform 160ms ease",
+                            },
+                            "&:hover": {
+                              bgcolor: "rgba(255,255,255,0.1)",
+                            },
+                          }}
+                        >
+                          <Typography
+                            component="span"
+                            sx={{
+                              opacity: isActive ? 1 : 0.82,
+                              fontWeight: isActive ? 600 : 400,
+                            }}
+                          >
+                            {item.label}
+                          </Typography>
+                        </Box>
+                      </RouterLink>
+                    );
+                  })}
                 </Box>
               </>
             )}

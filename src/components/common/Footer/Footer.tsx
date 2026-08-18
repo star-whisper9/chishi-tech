@@ -8,6 +8,12 @@ import {
 } from "@mui/material";
 import GlitchText from "./GlitchText";
 
+const MOE_COUNTER_URL = `${
+  import.meta.env.DEV
+    ? "/ext/moe-counter"
+    : "https://api.f1a.me/moe-counter"
+}/@chishi-tech?name=chishi-tech&theme=booru-lewd&padding=7&offset=0&align=top&scale=0.4&pixelated=1&darkmode=0`;
+
 const Footer: React.FC = () => {
   const theme = useTheme();
   const isSmall = useMediaQuery(theme.breakpoints.down("sm"));
@@ -22,9 +28,10 @@ const Footer: React.FC = () => {
     >
       <Box display="flex" justifyContent="center" sx={{ mb: 2 }}>
         <img
-          src="/ext/moe-counter/@chishi-tech?name=chishi-tech&theme=booru-lewd&padding=7&offset=0&align=top&scale=0.4&pixelated=1&darkmode=0"
+          src={MOE_COUNTER_URL}
           alt="moe counter"
           loading="lazy"
+          crossOrigin="anonymous"
           style={{ height: 40, imageRendering: "pixelated" }}
         />
       </Box>
